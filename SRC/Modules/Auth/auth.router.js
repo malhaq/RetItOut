@@ -15,6 +15,4 @@ router.post('/renterSignIn',AuthController.renterSignin);
 router.post('/deliverySignIn',AuthController.delivarySignin);
 router.post('/adminSignIn',AuthController.adminSignin);
 
-
-
 export default router;

@@ -155,7 +155,7 @@ export const adminSignin = async (req,res)=>{
         if(!admin){
             return res.json({message:"Invalid email !"});
         }
-        const checkPassword =  await bcrypt.compare(password.admin.password);
+        const checkPassword =  await bcrypt.compare(password,admin.password);
         if(!checkPassword){
             return res.json({message:"Invalid Password !"});
         }
