@@ -10,10 +10,10 @@ router.post('/deliverySignUp',AuthController.delivarySignUp);
 router.post('/adminSignUp',AuthController.adminSignUp);
 
 // signin section
-router.post('/ownerSignIp',AuthController.ownerSignin);
-router.post('/renterSignIp',AuthController.renterSignin);
-router.post('/deliverySignIp',AuthController.delivarySignin);
-router.post('/adminSignIp',AuthController.adminSignin);
+router.post('/ownerSignIn',AuthController.ownerSignin);
+router.post('/renterSignIn',AuthController.renterSignin);
+router.post('/deliverySignIn',AuthController.delivarySignin);
+router.post('/adminSignIn',AuthController.adminSignin);
 
 
 
