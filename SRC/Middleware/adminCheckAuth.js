@@ -5,7 +5,7 @@ const adminCheckAuth = (req, res,next) => {
   if(!authorization){
     return res.json({message:"Hi, Admin you are not  Authenticated User !"});
   }
-  const decode = jwt.verify(authorization,LGOINTOKENJABER102);
+  const decode = jwt.verify(authorization,"LGOINTOKENJABER");
   req.userId=decode.id;
   next();
 };

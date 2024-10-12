@@ -5,7 +5,7 @@ const deliveryCheckAuth = (req, res,next) => {
   if(!authorization){
     return res.json({message:"Hi, Delivery you are not  Authenticated User !"});
   }
-  const decode = jwt.verify(authorization,LGOINTOKENJABER101);
+  const decode = jwt.verify(authorization,"LGOINTOKENJABER101");
   req.userId=decode.id;
   next();
 };

@@ -5,7 +5,7 @@ const ownerCheckAuth = (req, res,next) => {
   if(!authorization){
     return res.json({message:"Hi, Owner you are not  Authenticated User !"});
   }
-  const decode = jwt.verify(authorization,LGOINTOKENJABER99);
+  const decode = jwt.verify(authorization,"LGOINTOKENJABER99");
   req.userId=decode.id;
   next();
 };

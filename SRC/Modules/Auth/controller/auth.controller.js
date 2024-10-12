@@ -159,7 +159,7 @@ export const adminSignin = async (req,res)=>{
         if(!checkPassword){
             return res.json({message:"Invalid Password !"});
         }
-        var token = jwt.sign({ id:admin._id }, 'LGOINTOKENJABER99');
+        var token = jwt.sign({ id:admin._id }, 'LGOINTOKENJABER');
         return res.json({message:"Hi, Login Successfully",token});
     }
     catch(error){
