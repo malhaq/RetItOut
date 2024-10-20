@@ -8,6 +8,7 @@ import RenterRouter from './RenterProfile/renterprofile.router.js';
 import DeliveryRouter from './DeliveryProfile/deliveryprofile.router.js';
 import EmailRouter from './EmailNotification/emailnotification.router.js';
 import FeedbackRouter from './UserFeedback/userfeedback.router.js';
+import AQRouter from './A&QOrComments/AQ.router.js';
 
 const initApp=(app,express)=>{
     connectDB();
@@ -21,6 +22,7 @@ const initApp=(app,express)=>{
     app.use('/delivery',DeliveryRouter);
     app.use('/email',EmailRouter);
     app.use('/feedback',FeedbackRouter);
+    app.use('/AQ',AQRouter);
     app.use('/*',(req,res)=>{
         return res.json({message:"page not found"});
     })
