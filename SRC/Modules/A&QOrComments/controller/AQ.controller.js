@@ -2,7 +2,7 @@ import OwnerReviwsCommentsModel from "../../../../DB/models/OwnerReviwsComments.
 import ownerUserModel from "../../../../DB/models/OwnerUser.model.js";
 import RentersCommentsModel from "../../../../DB/models/RentersComments.model.js";
 
-export const addComment = async (req,res)=>{
+export const addComment = async (req,res,next)=>{
   try{
     const {ownerEmail,productId,comment,isQuestion} = req.body;
     const renterId = req.userId;
@@ -24,7 +24,7 @@ export const addComment = async (req,res)=>{
   }
 };
 
-export const AnswerQuestion = async (req,res)=>{
+export const AnswerQuestion = async (req,res,next)=>{
   try{
     const {productId,answer} = req.body;
     const ownerId = req.userId;
