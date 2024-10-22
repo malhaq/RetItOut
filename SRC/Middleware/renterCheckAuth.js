@@ -5,7 +5,7 @@ const renterCheckAuth = (req, res,next) => {
   if(!authorization){
     return res.json({message:"Hi, Renter you are not  Authenticated User !"});
   }
-  const decode = jwt.verify(authorization,LGOINTOKENJABER100);
+  const decode = jwt.verify(authorization,"LGOINTOKENJABER100");
   req.userId=decode.id;
   next();
 };
