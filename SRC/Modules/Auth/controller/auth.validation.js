@@ -59,3 +59,12 @@ export const adminSignInSchema = Joi.object({
     email:Joi.string().email().required(),
     password:Joi.string().min(5).max(10).required(),
 });
+
+export const userEmailCheckForResetPassword = Joi.object({
+    email:Joi.string().email().required()
+});
+
+export const newPasswordSchema = Joi.object({
+    email:Joi.string().email().required(),
+    password:Joi.string().min(5).max(10).required(),
+});

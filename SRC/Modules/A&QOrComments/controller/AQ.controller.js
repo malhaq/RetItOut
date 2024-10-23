@@ -1,6 +1,8 @@
 import OwnerReviwsCommentsModel from "../../../../DB/models/OwnerReviwsComments.model.js";
 import ownerUserModel from "../../../../DB/models/OwnerUser.model.js";
 import RentersCommentsModel from "../../../../DB/models/RentersComments.model.js";
+import { commentSchema } from "./AQ.validation.js";
+import ProductCommentsModel from './../../../../DB/models/ProductComments.model.js';
 
 export const addComment = async (req,res,next)=>{
   try{
@@ -68,3 +70,59 @@ export const ownerViewQuestions = async(req,res) =>{
      return res.json({message:"Error during viewing the answers"});
     }
 };
+
+// general comment about some product
+
+export const writeComment = async (req,res)=>{
+  try{
+    const {productId,comment} = req.body;
+    const renterId = req.userId;
+    const checkComment = commentSchema.validate({comment},{abortEarly:false});
+    if(checkComment.error){
+      return res.json(checkComment.error);
+    }
+    const writtenComment = await ProductCommentsModel({renterId,productId,comment});
+    if(!writtenComment){
+      return res.json({message:"Error during send your comment"});
+    }
+    return res.json({message:"Your comment sent successfully",writtenComment});
+  }catch(error){
+    return res.status(500).json({message:"Error during writing the comment" , error:error.stack});
+  }
+}
+
+export const viewProductComments = async (req,res)=>{
+  try{
+   const allComments = await ProductCommentsModel.find();
+   return res.status(200).json({message:"Showing all comments successfully",allComments});
+  }catch(error){
+    return res.status(500).json({message:"Error during view the products comments",error:error.stack});
+  }
+}
+
+export const viewMyComments = async (req,res)=>{
+  try{
+   const id = req.userId;
+   const myComments = await ProductCommentsModel.find({renterId:id});
+   if(!myComments){
+    return res.json({message:"No comments for you!"});
+   }
+   return res.status(200).json({message:"This is all comments for you : ",myComments});
+  }catch(error){
+    return res.status(500).json({message:"Error durring show your comments",error:error.stack});
+  }
+}
+
+export const destroyMyComment = async (req,res)=>{
+  try{
+    const id = req.userId;
+    const commentId = req.body;
+    const destroyComment = await ProductCommentsModel.deleteOne({ _id: commentId, renterId: id });
+    if(!destroyComment.deletedCount){
+      return res.status(404).json({message:"Comment Not Found"});
+    }
+    return res.json({message:"your comment deleted successfully"});
+  }catch(error){
+    return res.status(500).json({message:"Error during destroy your comment",error:error.stack});
+  }
+}
