@@ -15,4 +15,16 @@ router.post('/renterSignIn',AuthController.renterSignin);
 router.post('/deliverySignIn',AuthController.delivarySignin);
 router.post('/adminSignIn',AuthController.adminSignin);
 
+// forget password router
+router.post('/oForgetPassword',AuthController.oforgetPassword);
+router.post('/rForgetPassword',AuthController.rforgetPassword);
+router.post('/dForgetPassword',AuthController.dforgetPassword);
+router.post('/aForgetPassword',AuthController.aforgetPassword);
+
+// otp code  verification
+router.post('/verifyOTP',AuthController.verifyOTPCode);
+
+// update the password
+router.post('/resetPassword',AuthController.resetPassword);
+
 export default router;
