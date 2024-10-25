@@ -18,7 +18,7 @@ const itemSchema = new mongoose.Schema({
         required: true,
     },
     owner: {
-        type: String, // Adjust type if needed (e.g., ObjectId for User reference)
+        type: String, 
         required: true,
     }
 });
