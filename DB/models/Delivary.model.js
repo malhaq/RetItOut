@@ -4,30 +4,39 @@ const { Schema } = mongoose;
 const delivaryUserSchema = new Schema({
   userName: {
     type: String,
-    requires:true,
+    requires: true,
   },
   age: {
-    type:Number,
+    type: Number,
   },
   email: {
     type: String,
-    requires:true,
+    requires: true,
   },
   address: {
     type: String,
-    requires:true,
+    requires: true,
   },
   gender: {
-   type:String,
-   enum:['Male','Female'],
-   default:'Male',
+    type: String,
+    enum: ['Male', 'Female'],
+    default: 'Male',
   },
-  password:{
-   type:String,
-   required:true
-  }
-},{
-    timestamps:true,
+  password: {
+    type: String,
+    required: true
+  },
+  isVerified: {
+    type: Boolean,
+    default: false
+  },
+  ratings: [{
+    orderid: { type: mongoose.Schema.Types.ObjectId, ref: 'oredrstable' },//this should reference the order that is beaing delivered
+    rating: Number,
+    Comment: String,
+  }]
+}, {
+  timestamps: true,
 });
-const delivaryUserModel = model('delivaryUser',delivaryUserSchema);
+const delivaryUserModel = model('delivaryUser', delivaryUserSchema);
 export default delivaryUserModel;
