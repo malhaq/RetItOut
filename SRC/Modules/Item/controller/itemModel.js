@@ -29,8 +29,12 @@ const itemSchema = new Schema({
         },
     },
     rentalDuration: {
-        startDate: Date,
-        endDate: Date,
+        startDate: {
+            type: Date,
+        },
+        endDate: {
+            type: Date,
+        },
     },
 }, {
     timestamps: true,

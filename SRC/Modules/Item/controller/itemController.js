@@ -65,41 +65,46 @@ export const deleteItem = async (req, res) => {
 
 export const rentItem = async (req, res) => {
   try {
-    const { id } = req.params;
-    const { startDate, endDate } = req.body;
+      const { id } = req.params;
+      const { startDate, endDate } = req.body;
 
-    const item = await Item.findById(id);
-    if (!item || !item.availability) {
-      return res.status(404).json({ message: 'Item not available for rent' });
-    }
+      if (new Date(endDate) <= new Date(startDate)) {
+          return res.status(400).json({ message: 'End date must be after start date.' });
+      }
 
-    item.rentalDuration = { startDate, endDate };
-    item.availability = false; 
-    const updatedItem = await item.save();
+      const item = await Item.findById(id);
+      if (!item || !item.availability) {
+          return res.status(404).json({ message: 'Item not available for rent' });
+      }
 
-    res.json(updatedItem);
+
+      item.rentalDuration = { startDate, endDate };
+      item.availability = false; 
+      const updatedItem = await item.save();
+
+      res.json(updatedItem);
   } catch (error) {
-    res.status(400).json({ message: error.message });
+      res.status(400).json({ message: error.message });
   }
 };
 
 
 export const returnItem = async (req, res) => {
   try {
-    const { id } = req.params;
+      const { id } = req.params;
 
-    const item = await Item.findById(id);
-    if (!item) {
-      return res.status(404).json({ message: 'Item not found' });
-    }
+      const item = await Item.findById(id);
+      if (!item) {
+          return res.status(404).json({ message: 'Item not found' });
+      }
 
-    item.rentalDuration = { startDate: null, endDate: null };
-    item.availability = true;
-    const updatedItem = await item.save();
+      item.rentalDuration = { startDate: null, endDate: null };
+      item.availability = true; 
+      const updatedItem = await item.save();
 
-    res.json(updatedItem);
+      res.json(updatedItem);
   } catch (error) {
-    res.status(400).json({ message: error.message });
+      res.status(400).json({ message: error.message });
   }
 };
 
