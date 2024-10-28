@@ -1,7 +1,6 @@
-const express = require('express');
-const router = express.Router();
-const verification = require('./controller/verification.controller');
-
+import { Router } from "express";
+import * as verification from './controller/verification.controller';
+const router = Router()
 
 /**
  * @desc verify the email using otp
@@ -9,7 +8,7 @@ const verification = require('./controller/verification.controller');
  * @method POST
  * @access public
  */
-router.post('/verification/verify-otp',verification.verifyOTP);
+router.post('/verify-otp', verification.verifyOTP);
 
 /**
  * @desc Resend verification OTP
@@ -17,4 +16,4 @@ router.post('/verification/verify-otp',verification.verifyOTP);
  * @method POST
  * @access public
  */
-router.post('/verification/resend-otp',verification.resendOTP);
+router.post('/resend-otp', verification.resendOTP);
