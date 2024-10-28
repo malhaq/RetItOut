@@ -7,8 +7,8 @@ import jwt from 'jsonwebtoken';
 import axios from 'axios';
 import { adminSignInSchema, adminSignUpSchema, deliverySignInSchema, deliverySignUpSchema, newPasswordSchema, ownerSignInSchema, ownerSignUpSchema, renterSignInSchema, renterSignUpSchema, userEmailCheckForResetPassword } from "./auth.validation.js";
 // verification
-const OTPVerification = require('../../../../DB/models/OTPVerification.model.js');
-const {OTPVerificationEmail} = require('../../Verification/controller/verification.controller.js');
+import { OTPVerificationEmail } from '../../Verification/controller/verification.controller.js';
+// const { OTPVerificationEmail } = require('../../Verification/controller/verification.controller.js');
 
 // signup section
 export const ownerSignUp = async (req, res) => {
@@ -21,10 +21,10 @@ export const ownerSignUp = async (req, res) => {
         const hashPassword = await bcrypt.hash(password, 8);
         const createOwner = await ownerUserModel.create({ userName, age, email, address, phoneNumber, gender, password: hashPassword });
         await OTPVerificationEmail({
-            _id:createOwner._id,
-            email:createOwner.email,
+            _id: createOwner._id,
+            email: createOwner.email,
             type: 'owner'
-        },res);
+        }, res);
         return res.json({ message: "Owner Signup Successfully, OTP verification Email Sent", createOwner });
     }
     catch (error) {
@@ -45,7 +45,7 @@ export const renterSignUp = async (req, res) => {
             _id: createrenter._id,
             email: createrenter.email,
             type: 'renter'
-        },res);
+        }, res);
         return res.json({ message: "Renter Signup Successfully, OTP verification Email Sent", createrenter });
     }
     catch (error) {
@@ -63,10 +63,10 @@ export const delivarySignUp = async (req, res) => {
         const hashPassword = await bcrypt.hash(password, 8);
         const createDelivary = await delivaryUserModel.create({ userName, age, email, address, phoneNumber, gender, password: hashPassword });
         await OTPVerificationEmail({
-            _id:createDelivary._id,
-            email:createDelivary.email,
+            _id: createDelivary._id,
+            email: createDelivary.email,
             type: 'delivary'
-        },res);
+        }, res);
         return res.json({ message: "Delivary Signup Successfully, OTP verification Email Sent", createDelivary });
     }
     catch (error) {
@@ -101,13 +101,16 @@ export const ownerSignin = async (req, res) => {
             return res.json(checkAuth.error);
         }
         const owner = await ownerUserModel.findOne({ email });
-        //TODO check if the user is verified
         if (!owner) {
             return res.json({ message: "Invalid email !" });
         }
         const checkPassword = await bcrypt.compare(password, owner.password);
         if (!checkPassword) {
             return res.json({ message: "Invalid password!" });
+        }
+        // make sure the user account is verified
+        if (!owner.isVerified) {
+            return res.json({ message: 'Unverified account, please verify your account' });
         }
         var token = jwt.sign({ id: owner._id }, 'LGOINTOKENJABER99');
         return res.json({ message: "Hi, Login Successfully", token });
@@ -126,13 +129,16 @@ export const renterSignin = async (req, res) => {
             return res.json(checkAuth.error);
         }
         const renter = await renterUserModel.findOne({ email });
-        //TODO check if the user is verified
         if (!renter) {
             return res.json({ message: "Invalid email !" });
         }
         const checkPassword = await bcrypt.compare(password, renter.password);
         if (!checkPassword) {
             return res.json({ message: "Invalid Password" });
+        }
+        // make sure the user account is verified
+        if (!renter.isVerified) {
+            return res.json({ message: 'Unverified account, please verify your account' });
         }
         var token = jwt.sign({ id: renter._id }, 'LGOINTOKENJABER100');
         return res.json({ message: "Hi, Login Successfully", token });
@@ -151,13 +157,16 @@ export const delivarySignin = async (req, res) => {
             return res.json(checkAuth.error);
         }
         const delivery = await delivaryUserModel.findOne({ email });
-        //TODO check if the user is verified
         if (!delivery) {
             return res.json({ message: "Invalid email !" });
         }
         const checkPassword = await bcrypt.compare(password, delivery.password);
         if (!checkPassword) {
             return res.json({ message: "Invalid password !" });
+        }
+        // make sure the user account is verified
+        if (!delivery.isVerified) {
+            return res.json({ message: 'Unverified account, please verify your account' });
         }
         var token = jwt.sign({ id: delivery._id }, 'LGOINTOKENJABER101');
         return res.json({ message: "Hi, Login Successfully", token });
