@@ -4,18 +4,18 @@ const { Schema } = mongoose;
 const delivaryUserSchema = new Schema({
   userName: {
     type: String,
-    requires: true,
+    required: true,
   },
   age: {
     type: Number,
   },
   email: {
     type: String,
-    requires: true,
+    required: true,
   },
   address: {
     type: String,
-    requires: true,
+    required: true,
   },
   gender: {
     type: String,

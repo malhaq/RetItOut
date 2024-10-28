@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';  // Use import for ES module
 const Schema = mongoose.Schema;
 
 const OTPVerificationSchema = new Schema({
@@ -9,6 +9,8 @@ const OTPVerificationSchema = new Schema({
     expiresAt: Date,
 });
 
-const OTPVerification = model('OTPVerification',OTPVerificationSchema);
+// Corrected to use mongoose.model
+const OTPVerification = mongoose.model('OTPVerification', OTPVerificationSchema);
 
-module.exports = OTPVerification;
+// Use default export for ES module
+export default OTPVerification;

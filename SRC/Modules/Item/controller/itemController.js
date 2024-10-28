@@ -40,6 +40,9 @@ export const updateItem = async (req, res) => {
     const updatedItem = await Item.findByIdAndUpdate(req.params.id, req.body, {
       new: true,
     });
+    if (!updatedItem) {
+      return res.status(404).json({ message: 'Item not found' });
+    }
     res.json(updatedItem);
   } catch (error) {
     res.status(400).json({ message: error.message });
@@ -50,6 +53,9 @@ export const updateItem = async (req, res) => {
 export const deleteItem = async (req, res) => {
   try {
     const deletedItem = await Item.findByIdAndDelete(req.params.id);
+    if (!deletedItem) {
+      return res.status(404).json({ message: 'Item not found' });
+    }
     res.json({ message: 'Item deleted successfully' });
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -67,9 +73,8 @@ export const rentItem = async (req, res) => {
       return res.status(404).json({ message: 'Item not available for rent' });
     }
 
-
     item.rentalDuration = { startDate, endDate };
-    item.availability = false; // Mark as rented
+    item.availability = false; 
     const updatedItem = await item.save();
 
     res.json(updatedItem);
@@ -88,7 +93,6 @@ export const returnItem = async (req, res) => {
       return res.status(404).json({ message: 'Item not found' });
     }
 
-
     item.rentalDuration = { startDate: null, endDate: null };
     item.availability = true;
     const updatedItem = await item.save();
@@ -96,5 +100,26 @@ export const returnItem = async (req, res) => {
     res.json(updatedItem);
   } catch (error) {
     res.status(400).json({ message: error.message });
+  }
+};
+
+export const updatePricing = async (req, res) => {
+  try {
+      const { id } = req.params;
+      const { rentalPrice } = req.body; 
+
+      const updatedItem = await Item.findByIdAndUpdate(
+          id,
+          { rentalPrice }, 
+          { new: true, runValidators: true } 
+      );
+
+      if (!updatedItem) {
+          return res.status(404).json({ message: 'Item not found' });
+      }
+
+      res.json(updatedItem);
+  } catch (error) {
+      res.status(400).json({ message: error.message });
   }
 };
