@@ -1,6 +1,7 @@
 import mongoose from 'mongoose';
+const { Schema, model } = mongoose;
 
-const itemSchema = new mongoose.Schema({
+const itemSchema = new Schema({
     name: {
         type: String,
         required: true,
@@ -9,39 +10,31 @@ const itemSchema = new mongoose.Schema({
         type: String,
         required: true,
     },
-    rentalPrice: {
-        type: Number,
-        required: true,
-    },
-    category: {
-        type: String,
-        required: true,
-    },
-    owner: {
-        type: String,
-        required: true,
-    },
-    rentalDuration: {
-        startDate: {
-            type: Date,
-            default: null,
-        },
-        endDate: {
-            type: Date,
-            default: null,
-        }
-    },
-    pricingModel: {
-        type: String,
-        enum: ['hourly', 'daily', 'weekly'],
-        default: 'daily',
-    },
     availability: {
         type: Boolean,
-        default: true, 
-    }
+        default: true,
+    },
+    rentalPrice: {
+        daily: {
+            type: Number,
+            required: true,
+        },
+        weekly: {
+            type: Number,
+            required: true,
+        },
+        monthly: {
+            type: Number,
+            required: true,
+        },
+    },
+    rentalDuration: {
+        startDate: Date,
+        endDate: Date,
+    },
+}, {
+    timestamps: true,
 });
 
-const Item = mongoose.model('Item', itemSchema);
-
+const Item = model('Item', itemSchema);
 export default Item;
