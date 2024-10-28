@@ -1,12 +1,16 @@
 import mongoose from "mongoose";
 
 const connectDB = async () => {
-    return mongoose.connect(`mongodb+srv://jabermohammad:jaberjaber@rental.1rhqg.mongodb.net/rentaldb`)
-    .then(result=>{
-        console.log("connected to DB");
-    }).catch(err=>{
-        console.log(`error to connect DB ${err}`);
-    })
+    try {
+        await mongoose.connect("mongodb+srv://jabermohammad:jaberjaber@rental.1rhqg.mongodb.net/rentaldb", {
+            useNewUrlParser: true,
+            useUnifiedTopology: true,
+        });
+        console.log("Successfully connected to the database.");
+    } catch (error) {
+        console.error(`Database connection error: ${error.message}`);
+        process.exit(1); 
+    }
 };
 
 export default connectDB;
