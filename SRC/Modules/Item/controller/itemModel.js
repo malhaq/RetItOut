@@ -18,8 +18,27 @@ const itemSchema = new mongoose.Schema({
         required: true,
     },
     owner: {
-        type: String, 
+        type: String,
         required: true,
+    },
+    rentalDuration: {
+        startDate: {
+            type: Date,
+            default: null,
+        },
+        endDate: {
+            type: Date,
+            default: null,
+        }
+    },
+    pricingModel: {
+        type: String,
+        enum: ['hourly', 'daily', 'weekly'],
+        default: 'daily',
+    },
+    availability: {
+        type: Boolean,
+        default: true, 
     }
 });
 
