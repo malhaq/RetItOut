@@ -1,6 +1,6 @@
 import Item from './itemModel.js';
 
-// Create a new item
+
 export const createItem = async (req, res) => {
   try {
     const item = new Item(req.body);
@@ -11,7 +11,7 @@ export const createItem = async (req, res) => {
   }
 };
 
-// Get all items
+
 export const getItems = async (req, res) => {
   try {
     const items = await Item.find();
@@ -21,7 +21,7 @@ export const getItems = async (req, res) => {
   }
 };
 
-// Get a specific item by ID
+
 export const getItemById = async (req, res) => {
   try {
     const item = await Item.findById(req.params.id);
@@ -34,7 +34,7 @@ export const getItemById = async (req, res) => {
   }
 };
 
-// Update an item
+
 export const updateItem = async (req, res) => {
   try {
     const updatedItem = await Item.findByIdAndUpdate(req.params.id, req.body, {
@@ -46,7 +46,7 @@ export const updateItem = async (req, res) => {
   }
 };
 
-// Delete an item
+
 export const deleteItem = async (req, res) => {
   try {
     const deletedItem = await Item.findByIdAndDelete(req.params.id);
@@ -57,5 +57,44 @@ export const deleteItem = async (req, res) => {
 };
 
 
+export const rentItem = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { startDate, endDate } = req.body;
+
+    const item = await Item.findById(id);
+    if (!item || !item.availability) {
+      return res.status(404).json({ message: 'Item not available for rent' });
+    }
 
 
+    item.rentalDuration = { startDate, endDate };
+    item.availability = false; // Mark as rented
+    const updatedItem = await item.save();
+
+    res.json(updatedItem);
+  } catch (error) {
+    res.status(400).json({ message: error.message });
+  }
+};
+
+
+export const returnItem = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const item = await Item.findById(id);
+    if (!item) {
+      return res.status(404).json({ message: 'Item not found' });
+    }
+
+
+    item.rentalDuration = { startDate: null, endDate: null };
+    item.availability = true;
+    const updatedItem = await item.save();
+
+    res.json(updatedItem);
+  } catch (error) {
+    res.status(400).json({ message: error.message });
+  }
+};
