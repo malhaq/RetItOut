@@ -1,7 +1,14 @@
-const OTPVerification = require('../../../../DB/models/OTPVerification.model');
-const delivaryUserModel = require('../../../../DB/models/Delivary.model');
-const ownerUserModel = require('../../../../DB/models/OwnerUser.model.js');
-const renterUserModel = require('../../../../DB/models/RenterUser.model.js')
+import OTPVerification from '../../../../DB/models/OTPVerification.model';
+import delivaryUserModel from '../../../../DB/models/Delivary.model';
+import ownerUserModel from '../../../../DB/models/OwnerUser.model.js';
+import renterUserModel from '../../../../DB/models/RenterUser.model.js';
+import nodemailer from 'nodemailer';
+
+// const OTPVerification = require('../../../../DB/models/OTPVerification.model');
+// const delivaryUserModel = require('../../../../DB/models/Delivary.model');
+// const ownerUserModel = require('../../../../DB/models/OwnerUser.model.js');
+// const renterUserModel = require('../../../../DB/models/RenterUser.model.js')
+
 const nodemailer = require('nodemailer');
 let transporter = nodemailer.createTransport({
     host: "smtp.gmail.com",
