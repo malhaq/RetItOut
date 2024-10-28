@@ -11,6 +11,7 @@ import FeedbackRouter from './UserFeedback/userfeedback.router.js';
 import AQRouter from './A&QOrComments/AQ.router.js';
 import RecomendationRouter from './Recomendations/recomendation.router.js';
 import ItemRouter from './Item/item.router.js';
+import Verification from './Verification/verification.router.js';
 
 
 const initApp=(app,express)=>{
@@ -28,6 +29,7 @@ const initApp=(app,express)=>{
     app.use('/AQ',AQRouter);
     app.use('recom',RecomendationRouter);
     app.use('/items', ItemRouter);
+    app.use('/verification',Verification);
     app.use('/*',(req,res)=>{
         return res.json({message:"page not found"});
     })
