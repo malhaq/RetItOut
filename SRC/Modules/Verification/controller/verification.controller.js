@@ -1,5 +1,5 @@
-import OTPVerification from '../../../../DB/models/OTPVerification.model';
-import delivaryUserModel from '../../../../DB/models/Delivary.model';
+import OTPVerification from '../../../../DB/models/OTPVerification.model.js';  
+import delivaryUserModel from '../../../../DB/models/Delivary.model.js';
 import ownerUserModel from '../../../../DB/models/OwnerUser.model.js';
 import renterUserModel from '../../../../DB/models/RenterUser.model.js';
 import nodemailer from 'nodemailer';
@@ -9,7 +9,7 @@ import nodemailer from 'nodemailer';
 // const ownerUserModel = require('../../../../DB/models/OwnerUser.model.js');
 // const renterUserModel = require('../../../../DB/models/RenterUser.model.js')
 
-const nodemailer = require('nodemailer');
+// const nodemailer = require('nodemailer');
 let transporter = nodemailer.createTransport({
     host: "smtp.gmail.com",
     port: 465,
