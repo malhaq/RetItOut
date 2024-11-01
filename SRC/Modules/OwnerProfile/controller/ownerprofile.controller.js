@@ -1,7 +1,7 @@
 import ownerUserModel from "../../../../DB/models/OwnerUser.model.js";
 import { ownerUpdateSchema } from "./ownerprofile.validation.js";
 import axios from 'axios';
-import { jwt } from 'jsonwebtoken';
+import  jwt  from 'jsonwebtoken';
 
 export const updateOwnerProfile = async (req,res)=>{
     try{
