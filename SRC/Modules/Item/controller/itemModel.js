@@ -6,6 +6,9 @@ const itemSchema = new Schema({
         type: String,
         required: true,
     },
+    owner: {
+        type: mongoose.Schema.Types.ObjectId, ref: 'ownerUserSchema', required: true
+    },
     description: {
         type: String,
         required: true,
