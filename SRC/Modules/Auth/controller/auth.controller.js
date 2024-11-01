@@ -8,7 +8,6 @@ import axios from 'axios';
 import { adminSignInSchema, adminSignUpSchema, deliverySignInSchema, deliverySignUpSchema, newPasswordSchema, ownerSignInSchema, ownerSignUpSchema, renterSignInSchema, renterSignUpSchema, userEmailCheckForResetPassword } from "./auth.validation.js";
 // verification
 import { OTPVerificationEmail } from '../../Verification/controller/verification.controller.js';
-// const { OTPVerificationEmail } = require('../../Verification/controller/verification.controller.js');
 
 // signup section
 export const ownerSignUp = async (req, res) => {
@@ -112,7 +111,7 @@ export const ownerSignin = async (req, res) => {
         if (!owner.isVerified) {
             return res.json({ message: 'Unverified account, please verify your account' });
         }
-        var token = jwt.sign({ id: owner._id }, 'LGOINTOKENJABER99');
+        var token = jwt.sign({ id: owner._id,userType:'owner'}, 'LGOINTOKENJABER99');
         return res.json({ message: "Hi, Login Successfully", token });
     }
     catch (error) {
@@ -140,7 +139,7 @@ export const renterSignin = async (req, res) => {
         if (!renter.isVerified) {
             return res.json({ message: 'Unverified account, please verify your account' });
         }
-        var token = jwt.sign({ id: renter._id }, 'LGOINTOKENJABER100');
+        var token = jwt.sign({ id: renter._id,userType:'renter' }, 'LGOINTOKENJABER100');
         return res.json({ message: "Hi, Login Successfully", token });
     }
     catch (error) {
@@ -168,7 +167,7 @@ export const delivarySignin = async (req, res) => {
         if (!delivery.isVerified) {
             return res.json({ message: 'Unverified account, please verify your account' });
         }
-        var token = jwt.sign({ id: delivery._id }, 'LGOINTOKENJABER101');
+        var token = jwt.sign({ id: delivery._id,userType:'delivary' }, 'LGOINTOKENJABER101');
         return res.json({ message: "Hi, Login Successfully", token });
     }
     catch (error) {
@@ -192,7 +191,7 @@ export const adminSignin = async (req, res) => {
         if (!checkPassword) {
             return res.json({ message: "Invalid Password !" });
         }
-        var token = jwt.sign({ id: admin._id }, 'LGOINTOKENJABER');
+        var token = jwt.sign({ id: admin._id,userType:'admin' }, 'LGOINTOKENJABER');
         return res.json({ message: "Hi, Login Successfully", token });
     }
     catch (error) {
