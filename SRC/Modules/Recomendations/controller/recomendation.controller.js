@@ -3,7 +3,6 @@
 
 export const productWithHighRental = async (req,res)=>{
     try{
-        // here I must  define
         // const x= await model.find().sort({couter:-1});
         // return x;
     }catch(error){

@@ -20,5 +20,13 @@ router.get('/OFB',adminCheckAuth,AdminController.OwnersFeedbacks);
 router.get('/RFB',adminCheckAuth,AdminController.RentersFeedbacks);
 router.get('/FB',adminCheckAuth,AdminController.allFeedbacks);
 
+// filters routeers
+router.get('/allOwners',adminCheckAuth,AdminController.getAllOWners);
+router.get('/allRenters',adminCheckAuth,AdminController.getAllRenters);
+router.get('/allProducts',adminCheckAuth,AdminController.getAllProducts);
+router.get('/allRentals',adminCheckAuth,AdminController.getAllRentals);
+router.get('/allDeliverys',adminCheckAuth,AdminController.getAllDeliverys);
+router.get('/allProductsCat',adminCheckAuth,AdminController.getAllCatProducts);
+router.get('/allCatRentals',adminCheckAuth,AdminController.getAllCatRentals);
 
 export default router;

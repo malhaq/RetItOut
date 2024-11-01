@@ -6,7 +6,7 @@ export const EmailNotify = async (req, res) => {
     const { to, subject, text } = req.body;
     const checkInputData = emailNotifySchema.validate({to, subject, text},{abortEarly:true});
     if(checkInputData.error){
-        return res.json(checkInputData.error);
+        return res.status(400).json(checkInputData.error);
     }
     let transporter = nodemailer.createTransport({
       host: "smtp.gmail.com",
@@ -23,8 +23,8 @@ export const EmailNotify = async (req, res) => {
       subject,
       text,
     });
-    res.json({ message: 'Email notification sent successfully'});
+    res.status(200).json({ message: 'Email notification sent successfully'});
   } catch (error) {
-    res.json({ message: 'Error sending email', error: error.message });
+    res.status(500).json({ message: 'Error sending email', error: error.stack });
   }
 };
