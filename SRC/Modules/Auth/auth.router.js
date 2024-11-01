@@ -28,7 +28,4 @@ router.post('/verifyOTP',AuthController.verifyOTPCode);
 // update the password
 router.post('/resetPassword',AuthController.resetPassword);
 
-// logout section
-router.post('/ownerLogout',ownerCheckAuth,AuthController.ownerLogOut);
-
 export default router;
