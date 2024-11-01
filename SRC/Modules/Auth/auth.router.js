@@ -1,5 +1,6 @@
 import { Router } from "express";
 import * as AuthController from './controller/auth.controller.js';
+import ownerCheckAuth from "../../Middleware/ownerCheckAuth.js";
 
 const router = Router();
 
@@ -26,5 +27,8 @@ router.post('/verifyOTP',AuthController.verifyOTPCode);
 
 // update the password
 router.post('/resetPassword',AuthController.resetPassword);
+
+// logout section
+router.post('/ownerLogout',ownerCheckAuth,AuthController.ownerLogOut);
 
 export default router;

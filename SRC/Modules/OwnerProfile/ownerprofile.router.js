@@ -6,5 +6,6 @@ const router = Router();
 
 router.put('/',ownerCheckAuth,OwnerController.updateOwnerProfile);
 router.delete('/',ownerCheckAuth,OwnerController.destroyOwner);
+router.post('/logout',ownerCheckAuth,OwnerController.ownerLogOut);
 
 export default router;

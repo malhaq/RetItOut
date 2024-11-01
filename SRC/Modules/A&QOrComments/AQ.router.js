@@ -11,6 +11,7 @@ router.post('/answerQ',ownerCheckAuth,AQController.AnswerQuestion);
 
 router.get('/renter/responses',renterCheckAuth,AQController.renterViewResposes);
 router.get('/owner/questions',ownerCheckAuth,AQController.ownerViewQuestions);
+router.get('/owner/comments',ownerCheckAuth,AQController.ownerViewComments);
 
 router.post('/writeComment',renterCheckAuth,AQController.writeComment);
 router.get('/viewProductComment',renterCheckAuth,AQController.viewProductComments);
