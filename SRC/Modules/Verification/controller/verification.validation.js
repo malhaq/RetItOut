@@ -22,8 +22,8 @@ function verifyResendSchema(obj) {
 
     return schema.validate(obj);
 }
-
-module.exports = {
+export { verifyOTPSchema, verifyResendSchema};
+export default{
     verifyOTPSchema,
     verifyResendSchema
 }

@@ -8,6 +8,8 @@ import axios from 'axios';
 import { adminSignInSchema, adminSignUpSchema, deliverySignInSchema, deliverySignUpSchema, newPasswordSchema, ownerSignInSchema, ownerSignUpSchema, renterSignInSchema, renterSignUpSchema, userEmailCheckForResetPassword } from "./auth.validation.js";
 // verification
 import { OTPVerificationEmail } from '../../Verification/controller/verification.controller.js';
+import userVerification from '../../../Middleware/userVerification.js';
+const { verifyTokenAndOwner, verifyTokenAndAdmin, verifyTokenAndRenter, verifyTokenAndDelivery, } = userVerification;
 
 // signup section
 export const ownerSignUp = async (req, res) => {
@@ -111,7 +113,7 @@ export const ownerSignin = async (req, res) => {
         if (!owner.isVerified) {
             return res.json({ message: 'Unverified account, please verify your account' });
         }
-        var token = jwt.sign({ id: owner._id,userType:'owner'}, 'LGOINTOKENJABER99');
+        var token = jwt.sign({ id: owner._id, userType: 'owner' }, 'LGOINTOKENJABER99');
         return res.json({ message: "Hi, Login Successfully", token });
     }
     catch (error) {
@@ -139,7 +141,7 @@ export const renterSignin = async (req, res) => {
         if (!renter.isVerified) {
             return res.json({ message: 'Unverified account, please verify your account' });
         }
-        var token = jwt.sign({ id: renter._id,userType:'renter' }, 'LGOINTOKENJABER100');
+        var token = jwt.sign({ id: renter._id, userType: 'renter' }, 'LGOINTOKENJABER100');
         return res.json({ message: "Hi, Login Successfully", token });
     }
     catch (error) {
@@ -167,7 +169,7 @@ export const delivarySignin = async (req, res) => {
         if (!delivery.isVerified) {
             return res.json({ message: 'Unverified account, please verify your account' });
         }
-        var token = jwt.sign({ id: delivery._id,userType:'delivary' }, 'LGOINTOKENJABER101');
+        var token = jwt.sign({ id: delivery._id, userType: 'delivary' }, 'LGOINTOKENJABER101');
         return res.json({ message: "Hi, Login Successfully", token });
     }
     catch (error) {
@@ -191,7 +193,7 @@ export const adminSignin = async (req, res) => {
         if (!checkPassword) {
             return res.json({ message: "Invalid Password !" });
         }
-        var token = jwt.sign({ id: admin._id,userType:'admin' }, 'LGOINTOKENJABER');
+        var token = jwt.sign({ id: admin._id, userType: 'admin' }, 'LGOINTOKENJABER');
         return res.json({ message: "Hi, Login Successfully", token });
     }
     catch (error) {
@@ -346,4 +348,81 @@ export const resetPassword = async (req, res) => {
     } catch (error) {
         return res.status(500).json({ message: "Error durong reset the password", error: error.stack });
     }
+}
+
+//Delete account 
+export const deleteRenterAccount = async (req, res) => {
+    await verifyTokenAndRenter(req, res, async () => {
+        try {
+            const tokenId = req.user.id;
+            const { id } = req.params;
+            if (id !== tokenId && req.user.userType !== 'admin') {
+                res.status(403).json({ message: 'Can not delete other people account' });
+            }
+            const renter = await renterUserModel.findByIdAndDelete(id);
+            if (!renter) {
+                return res.status(404).json({ message: 'Renter not found' });
+            }
+            res.json({ message: 'Renter account deleted successfully' });
+        } catch (error) {
+            res.status(404).json({ message: 'renter user not found' });
+        }
+    });
+}
+
+export const deleteOwnerAccount = async (req, res) => {
+    await verifyTokenAndOwner(req, res, async () => {
+        try {
+            const tokenId = req.user.id;
+            const { id } = req.params;
+            if (id !== tokenId && req.user.userType !== 'admin') {
+                res.status(403).json({ message: 'Can not delete other people account' });
+            }
+            const renter = await ownerUserModel.findByIdAndDelete(id);
+            if (!renter) {
+                return res.status(404).json({ message: 'Renter not found' });
+            }
+            res.json({ message: 'Renter account deleted successfully' });
+        } catch (error) {
+            res.status(404).json({ message: 'renter user not found' });
+        }
+    });
+}
+
+export const deleteDeliveryAccount = async (req, res) => {
+    await verifyTokenAndDelivery(req, res, async () => {
+        try {
+            const tokenId = req.user.id;
+            const { id } = req.params;
+            if (id !== tokenId && req.user.userType !== 'admin') {
+                res.status(403).json({ message: 'Can not delete other people account' });
+            }
+            const renter = await delivaryUserModel.findByIdAndDelete(id);
+            if (!renter) {
+                return res.status(404).json({ message: 'Renter not found' });
+            }
+            res.json({ message: 'Renter account deleted successfully' });
+        } catch (error) {
+            res.status(404).json({ message: 'renter user not found' });
+        }
+    });
+}
+
+export const deleteAdminAccount = async (req, res) => {
+    await verifyTokenAndAdmin(req, res, async () => {
+        try {
+            const isAdmin = req.user.userType;
+            const { id } = req.params;
+            if (isAdmin === 'admin') {
+                res.status(403).json({ message: 'Can not delete other people account' });
+            }
+            const renter = await adminUserModel.findByIdAndDelete(id);
+            if (!renter) {
+                return res.status(404).json({ message: 'Renter not found' });
+            }
+            res.json({ message: 'Renter account deleted successfully' });
+        } catch (error) {
+            res.status(404).json({ message: 'renter user not found' });
+        }
+    });
 }

@@ -20,7 +20,7 @@ function orderRatingSchema(obj) {
 }
 
 
-
+export {deliveryRatingSchema,orderRatingSchema} 
 export default{
     deliveryRatingSchema,
     orderRatingSchema,

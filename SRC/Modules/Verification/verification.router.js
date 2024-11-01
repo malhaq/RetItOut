@@ -1,5 +1,5 @@
 import { Router } from "express";
-import * as verification from './controller/verification.controller';
+import * as verification from './controller/verification.controller.js';
 const router = Router()
 
 /**
