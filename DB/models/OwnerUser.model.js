@@ -18,7 +18,8 @@ const ownerUserSchema = new Schema({
     requires:true,
   },
   phoneNumber:{
-    type:Number,
+    type:String,
+    required:true,
   },
   gender: {
    type:String,

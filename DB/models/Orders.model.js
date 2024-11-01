@@ -11,13 +11,13 @@ const orderSchema = new Schema({
         endDate:{type:Date,required:true},
     },
     logistics:{
-        deliveryOption:{type:String,enum:['pickup', 'delivery'],required:true},
+        deliveryOption:{type:String,enum:['pickup', 'delivery'],required:true,default:'pickup'},
         deliveryAddress: {type:String},
         pickupLocation: {type:String},
     },
     status:{type:String,enum:['booked','active','completed','canceled'],default:'booked'},
     ratings:{
-        reating:{type:number,min:0,max:5},
+        rating:{type:Number,min:0,max:5},
         comment: String,
     },
     

@@ -1,5 +1,5 @@
 import { Router } from "express";
-import * as trustSafety from './controller/TS.controller';
+import {rateDelivery,rateItem} from './controller/TS.controller.js';
 const router = Router()
 
 /**
@@ -8,7 +8,7 @@ const router = Router()
  * @method PUT
  * @access public
  */
-router.put('/delivery/:id',trustSafety.rateDelivery);
+router.put('/delivery/:id',rateDelivery);
 
 /**
  * @desc Rate the ordered item by it's id
@@ -16,6 +16,6 @@ router.put('/delivery/:id',trustSafety.rateDelivery);
  * @method PUT
  * @access public
  */
- router.put('/order/:id', trustSafety.rateOrder);
+ router.put('/order/:id', rateItem);
 
 export default router;
