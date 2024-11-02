@@ -1,14 +1,31 @@
 import jwt from 'jsonwebtoken';
 
+const secretKeys = {
+    admin: 'LGOINTOKENJABER',
+    owner: 'LGOINTOKENJABER99',
+    renter: 'LGOINTOKENJABER100',
+    delivery: 'LGOINTOKENJABER101'
+};
+
 function verifyToken(req, res, next) {
     const token = req.headers.token;
     if (token) {
         try {
-            const decode = jwt.verify(token, 'LGOINTOKENJABER99');
-            req.user = decode;
-            next();
+            const payload = jwt.decode(token);
+            if (!payload || !payload.userType || !secretKeys[payload.userType]) {
+                return res.status(400).json({ message: ' Invalid user type or invalid token' });
+            }
+            jwt.verify(token, secretKeys[payload.userType], (err, decoded) => {
+
+                if (err) {
+                    return res.status(401).json({ message: 'Invalid token' });
+                }
+                req.user = decoded;
+                next();
+            });
 
         } catch (error) {
+            console.error('Token verification error: ',error)
             res.status(401).json({ message: 'invalid token' });
         }
     } else {
