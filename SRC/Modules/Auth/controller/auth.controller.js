@@ -25,7 +25,7 @@ export const ownerSignUp = async (req, res) => {
             _id: createOwner._id,
             email: createOwner.email,
             type: 'owner'
-        }, res);
+        });
         if (otpResult.status === 'PENDING') {
             return res.status(201).json({
                 message: "Owner signup successful, OTP verification email sent.",
@@ -52,12 +52,23 @@ export const renterSignUp = async (req, res) => {
         }
         const hashPassword = await bcrypt.hash(password, 8);
         const createrenter = await renterUserModel.create({ userName, age, email, address, phoneNumber, gender, password: hashPassword });
-        await OTPVerificationEmail({
+        const otpResult = await OTPVerificationEmail({
             _id: createrenter._id,
             email: createrenter.email,
             type: 'renter'
-        }, res);
-        return res.json({ message: "Renter Signup Successfully, OTP verification Email Sent", createrenter });
+        });
+        if (otpResult.status === 'PENDING') {
+            return res.status(201).json({
+                message: "Renter signup successful, OTP verification email sent.",
+                createrenter
+            });
+        } else {
+            return res.status(500).json({
+                message: "Renter signup successful, but failed to send OTP verification email pleae order an otp resend.",
+                error: otpResult.message
+            });
+        }
+        
     }
     catch (error) {
         return res.json({ message: "There is an error occur during renter signup", error: error.stack });
@@ -73,12 +84,23 @@ export const delivarySignUp = async (req, res) => {
         }
         const hashPassword = await bcrypt.hash(password, 8);
         const createDelivary = await delivaryUserModel.create({ userName, age, email, address, phoneNumber, gender, password: hashPassword });
-        await OTPVerificationEmail({
+        const otpResult = await OTPVerificationEmail({
             _id: createDelivary._id,
             email: createDelivary.email,
             type: 'delivary'
-        }, res);
-        return res.json({ message: "Delivary Signup Successfully, OTP verification Email Sent", createDelivary });
+        });
+        if (otpResult.status === 'PENDING') {
+            return res.status(201).json({
+                message: "Delivary signup successful, OTP verification email sent.",
+                createDelivary
+            });
+        } else {
+            return res.status(500).json({
+                message: "Delivary signup successful, but failed to send OTP verification email pleae order an otp resend.",
+                error: otpResult.message
+            });
+        }
+       
     }
     catch (error) {
         return res.json({ message: "There is an error occur during delivery signup", error: error.stack });
