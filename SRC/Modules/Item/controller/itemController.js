@@ -3,10 +3,11 @@ import Orders from '../../../../DB/models/Orders.model.js';
 
 // middle ware for verifying the token and the user type
 import userVerification from '../../../Middleware/userVerification.js';
+import { request } from 'express';
 const {verifyTokenAndOwner, verifyTokenAndRenter } = userVerification;
 
 export const createItem = async (req, res) => {
-  await verifyTokenAndOwner(req, res, async () => {
+  verifyTokenAndOwner(req, res, async () => {
     try {
       req.body.owner = req.user.id;
       const item = new Item(req.body);
@@ -43,7 +44,7 @@ export const getItemById = async (req, res) => {
 
 
 export const updateItem = async (req, res) => {
-  await verifyTokenAndOwner(req, res, async () => {
+  verifyTokenAndOwner(req, res, async () => {
     try {
       const updatedItem = await Item.findByIdAndUpdate(req.params.id, req.body, {
         new: true,
@@ -60,7 +61,7 @@ export const updateItem = async (req, res) => {
 
 
 export const deleteItem = async (req, res) => {
-  await verifyTokenAndOwner(req, res, async () => {
+  verifyTokenAndOwner(req, res, async () => {
     try {
       const deletedItem = await Item.findByIdAndDelete(req.params.id);
       if (!deletedItem) {
@@ -75,7 +76,7 @@ export const deleteItem = async (req, res) => {
 
 
 export const rentItem = async (req, res) => {
-  await verifyTokenAndRenter(req, res, async () => {
+  verifyTokenAndRenter(req, res, async () => {
     try {
       req.body.userID = req.user.id;
       const { id } = req.params;
@@ -110,7 +111,7 @@ export const rentItem = async (req, res) => {
 
 
 export const returnItem = async (req, res) => {
-  await verifyTokenAndRenter(req, res, async () => {
+  verifyTokenAndRenter(req, res, async () => {
     try {
       const { id } = req.params;
 
@@ -122,6 +123,11 @@ export const returnItem = async (req, res) => {
       item.rentalDuration = { startDate: null, endDate: null };
       item.availability = true;
       const updatedItem = await item.save();
+      const updatedOrder = await Orders.findOneAndUpdate(
+        { itemId: id, renterId: request.user.id },
+        { status: 'completed' },
+        { new: true }
+      );
 
       res.json(updatedItem);
     } catch (error) {
@@ -131,7 +137,7 @@ export const returnItem = async (req, res) => {
 };
 
 export const updatePricing = async (req, res) => {
-  await verifyTokenAndOwner(req, res, async () => {
+  verifyTokenAndOwner(req, res, async () => {
     try {
       const { id } = req.params;
       const { rentalPrice } = req.body;
