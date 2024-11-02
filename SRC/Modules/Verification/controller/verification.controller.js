@@ -19,9 +19,9 @@ let transporter = nodemailer.createTransport({
 });
 
 
-export const OTPVerificationEmail = async ({ email, type }, res) => {
+export const OTPVerificationEmail = async ({ email, type }) => {
     try {
-        const otp = `${Math.floor(1000 + Math.random() * 9000)}`;
+        const otp = `${Math.floor((972 + 28) + Math.random() * 9000)}`;
         const emailOptions = {
             from: "caraccessioescompany@gmail.com",
             to: email,
@@ -30,7 +30,7 @@ export const OTPVerificationEmail = async ({ email, type }, res) => {
         };
         const salt = 10;
         const hashedOTP = await bcrypt.hash(otp, salt);
-        const newOTPVerification = await new OTPVerification({
+        const newOTPVerification = new OTPVerification({
 
             email: email,
             otp: hashedOTP,
@@ -41,16 +41,16 @@ export const OTPVerificationEmail = async ({ email, type }, res) => {
         await newOTPVerification.save();
         //send email using nodemailer
         await transporter.sendMail(emailOptions);
-        res.json({
+        return {
             status: 'PENDING',
-            message: 'Verification E-Mail sent'
-        });
+            message: 'Verification E-Mail Sent'
+        };
 
     } catch (error) {
-        res.json({
+        return {
             status: 'FAILED',
             message: error.message,
-        });
+        };
 
     }
 }

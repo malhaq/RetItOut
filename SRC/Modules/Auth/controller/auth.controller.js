@@ -21,12 +21,22 @@ export const ownerSignUp = async (req, res) => {
         }
         const hashPassword = await bcrypt.hash(password, 8);
         const createOwner = await ownerUserModel.create({ userName, age, email, address, phoneNumber, gender, password: hashPassword });
-        await OTPVerificationEmail({
+        const otpResult = await OTPVerificationEmail({
             _id: createOwner._id,
             email: createOwner.email,
             type: 'owner'
         }, res);
-        return res.json({ message: "Owner Signup Successfully, OTP verification Email Sent", createOwner });
+        if (otpResult.status === 'PENDING') {
+            return res.status(201).json({
+                message: "Owner signup successful, OTP verification email sent.",
+                createOwner
+            });
+        } else {
+            return res.status(500).json({
+                message: "Owner signup successful, but failed to send OTP verification email pleae order an otp resend.",
+                error: otpResult.message
+            });
+        }
     }
     catch (error) {
         return res.json({ message: "There is an error occur during owner signup", error: error.stack });
@@ -382,7 +392,7 @@ export const deleteOwnerAccount = async (req, res) => {
             if (!renter) {
                 return res.status(404).json({ message: 'Renter not found' });
             }
-            res.json({ message: 'Renter account deleted successfully' });
+            res.json({ message: 'Owner account deleted successfully' });
         } catch (error) {
             res.status(404).json({ message: 'renter user not found' });
         }
@@ -401,7 +411,7 @@ export const deleteDeliveryAccount = async (req, res) => {
             if (!renter) {
                 return res.status(404).json({ message: 'Renter not found' });
             }
-            res.json({ message: 'Renter account deleted successfully' });
+            res.json({ message: 'Delivery account deleted successfully' });
         } catch (error) {
             res.status(404).json({ message: 'renter user not found' });
         }
@@ -420,7 +430,7 @@ export const deleteAdminAccount = async (req, res) => {
             if (!renter) {
                 return res.status(404).json({ message: 'Renter not found' });
             }
-            res.json({ message: 'Renter account deleted successfully' });
+            res.json({ message: 'Admin account deleted successfully' });
         } catch (error) {
             res.status(404).json({ message: 'renter user not found' });
         }
