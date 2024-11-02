@@ -43,18 +43,3 @@ export const destroyOwner = async (req,res)=>{
        return res.status(500).json({message:"Error durong destroy owner"});
     }
 };
-
-// logout section
-export const ownerLogOut = async (req,res)=>{
-  try{
-    const uesrToken = req.header("authorization");
-    if(!token){
-      return res.status(400).json({message:"NO authorization"});
-    }
-    const { userid } = jwt.decode(uesrToken);
-    const removeToken = jwt.sign({ userid }, 'LGOINTOKENJABER99', { expiresIn: '1s' });
-    return res.status(200).json({message:"Owner Logout successfully"});
-  }catch(error){
-    return res.status(500).json({message:"Error during log out from the system!",error:error.stack});
-  }
-};
