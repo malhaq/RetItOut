@@ -201,7 +201,7 @@ export const delivarySignin = async (req, res) => {
         if (!delivery.isVerified) {
             return res.json({ message: 'Unverified account, please verify your account' });
         }
-        var token = jwt.sign({ id: delivery._id, userType: 'delivary' }, 'LGOINTOKENJABER101');
+        var token = jwt.sign({ id: delivery._id, userType: 'delivery' }, 'LGOINTOKENJABER101');
         return res.json({ message: "Hi, Login Successfully", token });
     }
     catch (error) {
@@ -412,11 +412,11 @@ export const deleteOwnerAccount = async (req, res) => {
             }
             const renter = await ownerUserModel.findByIdAndDelete(id);
             if (!renter) {
-                return res.status(404).json({ message: 'Renter not found' });
+                return res.status(404).json({ message: 'Owner user not found' });
             }
             res.json({ message: 'Owner account deleted successfully' });
         } catch (error) {
-            res.status(404).json({ message: 'renter user not found' });
+            res.status(404).json({ message: 'Owner user not found' });
         }
     });
 }
@@ -431,11 +431,11 @@ export const deleteDeliveryAccount = async (req, res) => {
             }
             const renter = await delivaryUserModel.findByIdAndDelete(id);
             if (!renter) {
-                return res.status(404).json({ message: 'Renter not found' });
+                return res.status(404).json({ message: 'Delivery acount not found' });
             }
             res.json({ message: 'Delivery account deleted successfully' });
         } catch (error) {
-            res.status(404).json({ message: 'renter user not found' });
+            res.status(404).json({ message: 'Delivery user not found' });
         }
     });
 }
@@ -450,11 +450,11 @@ export const deleteAdminAccount = async (req, res) => {
             }
             const renter = await adminUserModel.findByIdAndDelete(id);
             if (!renter) {
-                return res.status(404).json({ message: 'Renter not found' });
+                return res.status(404).json({ message: 'Admin not found' });
             }
             res.json({ message: 'Admin account deleted successfully' });
         } catch (error) {
-            res.status(404).json({ message: 'renter user not found' });
+            res.status(404).json({ message: 'Admin user not found' });
         }
     });
 }
