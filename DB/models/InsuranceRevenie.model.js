@@ -8,7 +8,7 @@ const InsuranceRevenueSchema = new Schema({
   },
   insurenceType:{
     type:String,
-    enum:['Basic','Supper'],
+    enum:['Basic','Normal','Supper'],
     requires:true,
   },
   amoutOfMoney:{

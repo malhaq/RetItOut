@@ -6,15 +6,20 @@ import adminCheckAuth from "../../Middleware/adminCheckAuth.js";
 
 const router = Router();
 
+// for specific owner
 router.post('/askQ',renterCheckAuth,AQController.addComment);
 router.post('/answerQ',ownerCheckAuth,AQController.AnswerQuestion);
+
 
 router.get('/renter/responses',renterCheckAuth,AQController.renterViewResposes);
 router.get('/owner/questions',ownerCheckAuth,AQController.ownerViewQuestions);
 router.get('/owner/comments',ownerCheckAuth,AQController.ownerViewComments);
 
 router.post('/writeComment',renterCheckAuth,AQController.writeComment);
-router.get('/viewProductComment',renterCheckAuth,AQController.viewProductComments);
+
+router.get('/RentersviewProductComment',renterCheckAuth,AQController.viewProductComments);
+router.get('/OwnersviewProductComment',ownerCheckAuth,AQController.viewProductComments);
+
 router.get('/getAllComments',adminCheckAuth,AQController.viewProductComments);
 
 router.get('/myComments',renterCheckAuth,AQController.viewMyComments);
