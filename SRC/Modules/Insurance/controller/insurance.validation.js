@@ -1,7 +1,12 @@
 import Joi from'joi';
 
 export const InsuSubSchema = Joi.object({
-    InsuranceType:Joi.string().valid('Basic', 'Supper').required(),
+    InsuranceType:Joi.string().valid('Basic','Normal','Supper').required(),
+    amountOfMoney:Joi.number().required()
+});
+
+export const InsuUnSubSchema = Joi.object({
+    InsuranceType:Joi.string().valid('Basic','Normal','Supper').required(),
 });
 
 export const complaintSchema = Joi.object({

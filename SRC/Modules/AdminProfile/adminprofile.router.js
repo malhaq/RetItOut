@@ -20,13 +20,23 @@ router.get('/OFB',adminCheckAuth,AdminController.OwnersFeedbacks);
 router.get('/RFB',adminCheckAuth,AdminController.RentersFeedbacks);
 router.get('/FB',adminCheckAuth,AdminController.allFeedbacks);
 
+// insurances management
+router.post('/createIsurance',adminCheckAuth,AdminController.addInsurance);
+router.put('/updateInsurance/:isuranceId',adminCheckAuth,AdminController.updateInsurance);
+router.delete('/destroyInsurance/:isuranceId',adminCheckAuth,AdminController.destroyInsurance);
+router.get('/allInsurance',adminCheckAuth,AdminController.showAllInsurances);
+
 // filters routeers
 router.get('/allOwners',adminCheckAuth,AdminController.getAllOWners);
 router.get('/allRenters',adminCheckAuth,AdminController.getAllRenters);
 router.get('/allProducts',adminCheckAuth,AdminController.getAllProducts);
-router.get('/allRentals',adminCheckAuth,AdminController.getAllRentals);
 router.get('/allDeliverys',adminCheckAuth,AdminController.getAllDeliverys);
 router.get('/allProductsCat',adminCheckAuth,AdminController.getAllCatProducts);
-router.get('/allCatRentals',adminCheckAuth,AdminController.getAllCatRentals);
+
+// manage the complaints messages
+router.put('/complaintProcess/:id',adminCheckAuth,AdminController.ComplaintProcess);
+
+// revenues section
+router.get('/Revenue',adminCheckAuth,AdminController.getRevenues);
 
 export default router;

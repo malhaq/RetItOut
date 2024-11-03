@@ -17,19 +17,19 @@ export const ownerSignUp = async (req, res) => {
         const { userName, age, email, address, phoneNumber, gender, password } = req.body;
         const checkValid = ownerSignUpSchema.validate({ userName, age, email, address, phoneNumber, gender, password }, { abortEarly: false });
         if (checkValid.error) {
-            return res.json(checkValid.error);
+            return res.status(400).json(checkValid.error);
         }
         const hashPassword = await bcrypt.hash(password, 8);
-        const createOwner = await ownerUserModel.create({ userName, age, email, address, phoneNumber, gender, password: hashPassword });
+        const createowner = await ownerUserModel.create({ userName, age, email, address, phoneNumber, gender, password: hashPassword });
         const otpResult = await OTPVerificationEmail({
-            _id: createOwner._id,
-            email: createOwner.email,
+            _id: createowner._id,
+            email: createowner.email,
             type: 'owner'
         });
         if (otpResult.status === 'PENDING') {
             return res.status(201).json({
                 message: "Owner signup successful, OTP verification email sent.",
-                createOwner
+                createowner
             });
         } else {
             return res.status(500).json({
@@ -39,7 +39,7 @@ export const ownerSignUp = async (req, res) => {
         }
     }
     catch (error) {
-        return res.json({ message: "There is an error occur during owner signup", error: error.stack });
+        return res.status(500).json({ message: "There is an error occur during owner signup", error: error.stack });
     }
 }
 
@@ -68,7 +68,6 @@ export const renterSignUp = async (req, res) => {
                 error: otpResult.message
             });
         }
-        
     }
     catch (error) {
         return res.json({ message: "There is an error occur during renter signup", error: error.stack });
@@ -80,27 +79,26 @@ export const delivarySignUp = async (req, res) => {
         const { userName, age, email, address, phoneNumber, gender, password } = req.body;
         const checkValid = deliverySignUpSchema.validate({ userName, age, email, address, phoneNumber, gender, password }, { abortEarly: false });
         if (checkValid.error) {
-            return res.json(checkValid.error);
+            return res.status(400).json(checkValid.error);
         }
         const hashPassword = await bcrypt.hash(password, 8);
-        const createDelivary = await delivaryUserModel.create({ userName, age, email, address, phoneNumber, gender, password: hashPassword });
+        const createdelivery = await delivaryUserModel.create({ userName, age, email, address, phoneNumber, gender, password: hashPassword });
         const otpResult = await OTPVerificationEmail({
-            _id: createDelivary._id,
-            email: createDelivary.email,
+            _id: createdelivery._id,
+            email: createdelivery.email,
             type: 'delivary'
         });
         if (otpResult.status === 'PENDING') {
             return res.status(201).json({
-                message: "Delivary signup successful, OTP verification email sent.",
-                createDelivary
+                message: "Delivery signup successful, OTP verification email sent.",
+                createdelivery
             });
         } else {
             return res.status(500).json({
-                message: "Delivary signup successful, but failed to send OTP verification email pleae order an otp resend.",
+                message: "Delivery signup successful, but failed to send OTP verification email pleae order an otp resend.",
                 error: otpResult.message
             });
         }
-       
     }
     catch (error) {
         return res.json({ message: "There is an error occur during delivery signup", error: error.stack });

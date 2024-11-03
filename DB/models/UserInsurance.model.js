@@ -8,24 +8,16 @@ const UserInsuranceSchema = new Schema({
     },
     InsuranceType:{
        type:String,
-       enum:['Basic','Supper'],
+       enum:['Basic','Normal','Supper'],
        requires:true,
     },
     ProductCovers:{
        type:Number,
        requires:true,
-       default:0
     },
-    insuProducts:{
-      type: [String],
-      default: [],
-    },
-    InsuranceStartDate:{
-       type:Date,
-       default:Date.now
-    },
-    InsuranceExpireDate:{
-       type:Date,
+    Price:{
+      type:Number,
+      requires:true,
     },
     // from admin to active or inactive this insurance
     InsuranceValidation:{
