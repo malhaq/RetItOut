@@ -1,4 +1,9 @@
 import Orders from '../../../../DB/models/Orders.model.js';
+import Item from '../../Item/controller/itemModel.js';
+import axios from 'axios';
+import dotenv from 'dotenv';
+
+dotenv.config();
 
 // middle ware for verifying the token and the user type
 import userVerification from '../../../Middleware/userVerification.js';
@@ -21,7 +26,7 @@ export const getUndeliveredOrders = async (req, res) => {
         }
     });
 }
-// Delivery driver assgin an order by the orer id to him self  
+// Delivery driver assgin an order by the order id to him self  
 export const assignToMySelf = async (req, res) => {
     verifyTokenAndDelivery(req, res, async () => {
         try {
@@ -95,7 +100,7 @@ export const getAllOrders = async (req, res) => {
     });
 }
 
-// get all the orders that have been ordered ny the renter 
+// get all the orders that have been ordered by the renter 
 export const getUserOrders = async (req, res) => {
     verifyTokenAndRenter(req, res, async () => {
         try {
@@ -113,9 +118,103 @@ export const getUserOrders = async (req, res) => {
     });
 }
 
-// Owner can add a pickuplocation using foursquare api
+// external API usage
+// Owner can add a pickuplocation for an item by its id using foursquare api
 export const addPickUpLocation = async (req, res) => {
-    verifyTokenAndOwner(req,res,async()=>{
-        //TODO: add the pickuplocation
+    verifyTokenAndOwner(req, res, async () => {
+        try {
+            const { lat, lng, searchQuery } = req.body;
+            const itemId = req.params.id;
+
+            // API endpoint and key
+            const foursquareURL = 'https://api.foursquare.com/v3/places/search';
+            const apikey = process.env.FOURSQUARE_API_KEY;
+
+            // send request for the api 
+            const { data } = await axios.get(foursquareURL, {
+                headers: {
+                    Authorization: apikey
+                },
+                params: {
+                    query: searchQuery || '',
+                    ll: `${lat},${lng}`,
+                    limit: 1
+                }
+            });
+            const location = data.results[0];
+            if (!location) {
+                return res.status(404).json({ message: 'No suggested pickup location found!' });
+            }
+            const updatedItem = Item.findByIdAndUpdate(
+                itemId,
+                {
+                    'logistics.pickupLocation.name': location.name,
+                    'logistics.pickupLocation.address': location.location.formatted_address,
+                    'logistics.pickupLocation.coordinates.lat': location.geocodes.main.latitude,
+                    'logistics.pickupLocation.coordinates.lng': location.geocodes.main.longitude
+                },
+                {new:true,runValidators: true}
+            );
+            if (!updatedItem) {
+                return res.status(404).json({ message: 'Item not found' });
+            }
+
+            res.status(201).json({ message: 'Pickup location added successfully', item: updatedItem });
+
+
+
+        } catch (error) {
+            res.status(500).json({ message: 'Server error coudnot add pickup location', error: error.message });
+        }
+    });
+}
+
+// owner can change the pickup location for a current order by id
+export const updateOrderPickupLocation = async (req, res) => {
+    verifyTokenAndOwner(req, res, async () => {
+        try {
+            const { lat, lng, searchQuery } = req.body;
+            const OrderId = req.params.id;
+
+            // API endpoint and key
+            const foursquareURL = 'https://api.foursquare.com/v3/places/search';
+            const apikey = process.env.FOURSQUARE_API_KEY;
+
+            // send request for the api 
+            const { data } = await axios.get(foursquareURL, {
+                headers: {
+                    Authorization: apikey
+                },
+                params: {
+                    query: searchQuery || '',
+                    ll: `${lat},${lng}`,
+                    limit: 1
+                }
+            });
+            const location = data.results[0];
+            if (!location) {
+                return res.status(404).json({ message: 'No suggested pickup location found!' });
+            }
+            const updatedOrder = Orders.findByIdAndUpdate(
+                OrderId,
+                {
+                    'logistics.pickupLocation.name': location.name,
+                    'logistics.pickupLocation.address': location.location.formatted_address,
+                    'logistics.pickupLocation.coordinates.lat': location.geocodes.main.latitude,
+                    'logistics.pickupLocation.coordinates.lng': location.geocodes.main.longitude
+                },
+                {new:true,runValidators: true}
+            );
+            if (!updatedOrder) {
+                return res.status(404).json({ message: 'Order not found' });
+            }
+
+            res.status(201).json({ message: 'Pickup location added successfully', item: updatedOrder });
+
+
+
+        } catch (error) {
+            res.status(500).json({ message: 'Server error coudnot add pickup location', error: error.message });
+        }
     });
 }

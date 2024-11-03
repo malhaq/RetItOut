@@ -19,6 +19,16 @@ const itemSchema = new Schema({
     },
     logistics:{
         deliveryOption:{type:String, enum:['pickup', 'delivery'], required:true,default:'pickup'},
+        pickupLocation: {
+            type:{
+                name:String,
+                address:String,
+                coordinates: {
+                    lat: Number,
+                    lng: Number
+                }
+            }
+        },
     },
     rentalPrice: {
         daily: {
