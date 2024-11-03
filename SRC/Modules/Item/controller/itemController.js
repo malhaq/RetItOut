@@ -4,7 +4,7 @@ import Orders from '../../../../DB/models/Orders.model.js';
 // middle ware for verifying the token and the user type
 import userVerification from '../../../Middleware/userVerification.js';
 import { request } from 'express';
-const {verifyTokenAndOwner, verifyTokenAndRenter } = userVerification;
+const { verifyTokenAndOwner, verifyTokenAndRenter } = userVerification;
 
 export const createItem = async (req, res) => {
   verifyTokenAndOwner(req, res, async () => {
@@ -80,7 +80,7 @@ export const rentItem = async (req, res) => {
     try {
       req.body.userID = req.user.id;
       const { id } = req.params;
-      const { startDate, endDate, userID } = req.body;
+      const { startDate, endDate, userID, deliveryOption,deliveryAddress } = req.body;
 
       const item = await Item.findById(id);
       if (!item || !item.availability) {
@@ -90,17 +90,54 @@ export const rentItem = async (req, res) => {
       item.rentalDuration = { startDate, endDate };
       item.availability = false;
       const updatedItem = await item.save();
+      let newOrder;
+      let logistic;
+      if (!deliveryOption) {
+        logistic = {
+          deliveryOption: 'pickup',
+          deliveryAddress: null,
+          pickupLocation: item.logistics.pickupLocation,
+        };
 
-      //create a new order in the Orders collection
-      const newOrder = new Orders({
-        itemId: item._id,
-        renterId: userID,
-        ownerId: item.owner,
-        rentalPeriod: {
-          startDate,
-          endDate,
+        //create a new order in the Orders collection
+
+        newOrder = new Orders({
+          itemId: item._id,
+          renterId: userID,
+          ownerId: item.owner,
+          rentalPeriod: {
+            startDate,
+            endDate,
+          },
+          logistics: logistic
+        });
+      } else {
+        let address;
+        if(!deliveryAddress) {
+          address = null;
+        }else {
+          address = deliveryAddress;
         }
-      });
+        logistic = {
+          deliveryOption: deliveryOption,
+          deliveryAddress: address,
+          pickupLocation: item.logistics.pickupLocation,
+        };
+
+        //create a new order in the Orders collection
+
+        newOrder = new Orders({
+          itemId: item._id,
+          renterId: userID,
+          ownerId: item.owner,
+          rentalPeriod: {
+            startDate,
+            endDate,
+          },
+          logistics: logistic
+        });
+      }
+      newOrder = await newOrder.save();
 
       res.json(updatedItem);
     } catch (error) {
