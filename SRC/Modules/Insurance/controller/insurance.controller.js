@@ -92,7 +92,20 @@ export const complaint = async (req,res)=>{
     }
     const renterId = req.userId;
     const createComplaintMsg = await UserComplaintModel.create({renterId:renterId,ProductId:ProductId,Msg:Msg});
-    return res.status(200).json({message:"Your Complaint sent successfully",createComplaintMsg});
+    // admin notification
+    const admin = await adminUserModel.findOne({});
+    const adminEmail = admin.email;
+    try {
+      await axios.post('http://localhost:3000/email/sendEmail',
+          {
+              to: adminEmail,
+              subject: "Complaint Request",
+              text: `Dear Admin,\n\nYou have a new complaint letter in your dashbord\n\nPlease check it as soon as possible\n\nBest regards,\nRental Platform\n\nThe message is: ${Msg} `,
+          });
+  } catch (error) {
+      return res.json({ message: "Error during sending the email", error: error.stack });
+  }
+  return res.status(200).json({message:"Your Complaint sent successfully",createComplaintMsg});
    }catch(error){
     return res.status(500).json({message:"There is an error during sending the complaint msg", error:error.stack});
    }

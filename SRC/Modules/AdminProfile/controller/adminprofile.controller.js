@@ -200,6 +200,20 @@ export const ComplaintProcess = async (req, res) => {
       if (!ProcessComplaint) {
           return res.status(404).json({ message: "Not Found the complaint!" });
       }
+      // renter notification
+      const complaint  = await UserComplaintModel.findOne({_id:id});
+      const renterId = complaint.renterId;
+      const renter = await renterUserModel.findOne({_id:renterId});
+      try {
+        await axios.post('http://localhost:3000/email/sendEmail',
+            {
+                to: renter.email,
+                subject: "Complaint Solved",
+                text: `Dear Renter,\n\nYout complaint request is solved\n\nWe apologize for the problem\n\nBest regards,\nRental Platform`,
+            });
+    } catch (error) {
+        return res.json({ message: "Error during sending the email", error: error.stack });
+    }
       return res.status(200).json({
           message: "Complaint message processed successfully.",
           ProcessComplaint,
