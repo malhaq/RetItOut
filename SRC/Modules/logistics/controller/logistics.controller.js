@@ -2,6 +2,7 @@ import Orders from '../../../../DB/models/Orders.model.js';
 import Item from '../../Item/controller/itemModel.js';
 import axios from 'axios';
 import dotenv from 'dotenv';
+import {idSchema,locationSchema} from './logisticsValidation.js';
 
 dotenv.config();
 
@@ -29,6 +30,10 @@ export const getUndeliveredOrders = async (req, res) => {
 // Delivery driver assgin an order by the order id to him self  
 export const assignToMySelf = async (req, res) => {
     verifyTokenAndDelivery(req, res, async () => {
+        const {error} = idSchema(req.params);
+        if (error) {
+            return res.status(400).json({ message: error.details[0].message });
+        }
         try {
             const orederId = req.params.id;
             const updatedOrder = await Orders.findByIdAndUpdate(
@@ -49,6 +54,10 @@ export const assignToMySelf = async (req, res) => {
 // Mark the order as delivered
 export const markAsDelivered = async (req, res) => {
     verifyTokenAndDelivery(req, res, async () => {
+        const {error} = idSchema(req.params);
+        if (error) {
+            return res.status(400).json({ message: error.details[0].message });
+        }
         try {
             const orderId = req.params.id;
             const updatedOrder = await Orders.findByIdAndUpdate(
@@ -122,6 +131,10 @@ export const getUserOrders = async (req, res) => {
 // Owner can add a pickuplocation for an item by its id using foursquare api
 export const addPickUpLocation = async (req, res) => {
     verifyTokenAndOwner(req, res, async () => {
+        const {error} = locationSchema(req.body);
+        if (error) {
+            return res.status(400).json({ message: error.details[0].message });
+        }
         try {
             const { lat, lng, searchQuery } = req.body;
             const itemId = req.params.id;
@@ -172,6 +185,10 @@ export const addPickUpLocation = async (req, res) => {
 // owner can change the pickup location for a current order by id
 export const updateOrderPickupLocation = async (req, res) => {
     verifyTokenAndOwner(req, res, async () => {
+        const {error} = locationSchema(req.body);
+        if (error) {
+            return res.status(400).json({ message: error.details[0].message });
+        }
         try {
             const { lat, lng, searchQuery } = req.body;
             const OrderId = req.params.id;
