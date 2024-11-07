@@ -11,7 +11,7 @@ export const askFeedbackOwner = async (req, res) => {
   try {
     const owners = await ownerUserModel.find({});
     if (owners.length === 0) {
-      return res.json({ message: "No owners found to send feedback requests to." });
+      return res.status(404).json({ message: "No Owners Found!" });
     }
     const emailPromises = owners.map(async (owner) => {
     const ownerEmail = owner.email;
@@ -23,12 +23,12 @@ export const askFeedbackOwner = async (req, res) => {
   });
   await Promise.all(emailPromises);
   } catch (error) {
-    return res.json({
+    return res.status(500).json({
       message: "Error during sending the email",
       error: error.stack,
     });
   }
-  return res.json({
+  return res.status(200).json({
     message: "FeedBack Request send successfully to all owners",
   });
 };
@@ -79,22 +79,25 @@ export const getUserEmailFeedback = async (req, res) => {
 export const askFeedbackRenter = async (req, res) => {
   try {
     const renters = await renterUserModel.find({});
+    if (renters.length === 0) {
+      return res.status(404).json({ message: "No Renters Found!" });
+    }
     const emailPromises = renters.map(async (renters) => {
     const renterEmail = renters.email;
     await axios.post("http://localhost:3000/email/sendEmail", {
       to: renterEmail,
-      subject: "🌟 We Value Your Feedback! 🌟",
+      subject: "🌟 Request to Feedback! 🌟",
       text: `Dear Renters,\n\nWe hope you've had a great experience with us! Your feedback is important and helps us improve.\n\nPlease take a moment to rate our app and share your thoughts.\n\nThanks for being part of our community!\n\nBest regards,\nThe Rental Platform Team`
     });
   });
   await Promise.all(emailPromises);
   } catch (error) {
-    return res.json({
+    return res.status(500).json({
       message: "Error during sending the email",
       error: error.stack,
     });
   }
-  return res.json({
+  return res.status(200).json({
     message: "FeedBack Request send successfully to all renters",
   });
 };
@@ -129,3 +132,4 @@ export const getRenterEmailFeedback = async (req, res) => {
 
   imap.connect();
 };
+

@@ -1,15 +1,22 @@
+import adminUserModel from "../../../../DB/models/AdminUser.model.js";
+import InsuranceRevenueModel from "../../../../DB/models/InsuranceRevenie.model.js";
+import renterUserModel from "../../../../DB/models/RenterUser.model.js";
 import UserComplaintModel from "../../../../DB/models/UserComplaint.model.js";
+import Item from "../../Item/controller/itemModel.js";
 import UserInsuranceModel from "./../../../../DB/models/UserInsurance.model.js";
 import { complaintSchema, InsuSubSchema } from "./insurance.validation.js";
+import axios from 'axios';
 
+// add insurance
 export const InsuranceSubscrption = async (req, res) => {
   try {
-    const { InsuranceType } = req.body;
+    const { InsuranceType , amountOfMoney} = req.body;
     const checkType = InsuSubSchema.validate({InsuranceType},{abortEarly:false});
     if(checkType.error){
-        return res.json(checkType.error);
+      return res.status(400).json(checkType.error);
     }
     const ownerId = req.userId;
+    // check if this insurance exist or not
     const active = await UserInsuranceModel.findOne({
       InsuranceType: InsuranceType,
       InsuranceValidation: true,
@@ -28,16 +35,16 @@ export const InsuranceSubscrption = async (req, res) => {
       });
     }
     let productCovers = 0;
-    let insuCost = 0;
+    let insuCost = 0; // in $ amount of money
     let insuProducts = [];
     if (InsuranceType === "Basic") {
       productCovers = 10;
       insuCost = 15;
-      // here I must go  to the products database and store just first 10 products
+      insuProducts = await Item.find({}).limit(10);
     } else if (InsuranceType === "Supper") {
       productCovers = Infinity;
       insuCost = 50;
-      // here  I  muat store all  owner products
+      insuProducts = await Item.find({});
     }
     const createInsu = await UserInsuranceModel.create({
       OwnerId: ownerId,
@@ -47,6 +54,7 @@ export const InsuranceSubscrption = async (req, res) => {
       InsuranceExpireDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
       Subscribted: true,
     });
+    const money = await InsuranceRevenueModel.create({ownerId,InsuranceType,amountOfMoney});
     return res.json({
       message: "You have subscribed successfully",
       createInsu,
@@ -59,6 +67,7 @@ export const InsuranceSubscrption = async (req, res) => {
   }
 };
 
+// remove the insurance
 export const InsuranceUnSubscrption = async (req, res) => {
   try {
     const { InsuranceType } = req.body;
@@ -93,6 +102,7 @@ export const InsuranceUnSubscrption = async (req, res) => {
   }
 };
 
+// the renter complaint about some item
 export const complaint = async (req,res)=>{
    try{
     const {ProductId,Msg} = req.body;
@@ -101,11 +111,26 @@ export const complaint = async (req,res)=>{
         return res.json(checkMsg.error);
     }
     const renterId = req.userId;
-    // here I must check the rental for this renter
-
+    const renterName = await renterUserModel.find({userName});
     const createComplaintMsg = await UserComplaintModel.create({renterId:renterId,ProductId:ProductId,Msg:Msg});
-    return res.json({message:"Your Complaint sent successfully"});
+    try{
+      const adminEmail = await adminUserModel.find({email});
+      try {
+        await axios.post('http://localhost:3000/email/sendEmail', {
+            to: adminEmail,
+            subject: "New user complaint",
+            text: `Dear Admin,\n\nYou Have new complaint message from ${renterName}.\n\nThe Message is ${createComplaintMsg}\n\nPlease check your application dashboard. \n\nBest regards,\nRental Platform`
+        });
+
+        return res.status(200).json({ message: "OTP sent successfully", OTPCode });
+    } catch (error) {
+        return res.status(500).json({ message: "Error during sending the email", error: error.stack });
+    }
+    }catch(error){
+      return res.status(500).json({message:"Error during get the admin main",error:error.stack});
+    }
+    return res.status(200).json({message:"Your Complaint sent successfully"});
    }catch(error){
-    return res.json({message:"There is an error during sending the complaint msg", error:error.stack});
+    return res.status(500).json({message:"There is an error during sending the complaint msg", error:error.stack});
    }
 };

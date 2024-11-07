@@ -1,6 +1,7 @@
 import { Router } from "express";
 import * as AuthController from './controller/auth.controller.js';
 
+
 const router = Router();
 
 // signup section
@@ -26,5 +27,38 @@ router.post('/verifyOTP',AuthController.verifyOTPCode);
 
 // update the password
 router.post('/resetPassword',AuthController.resetPassword);
+
+//delete accounts
+/**
+ * @desc delete admin account by ID only by admins
+ * @route /auth/delete/admin/:id
+ * @method DELETE
+ * @access private
+ */
+router.delete('/delete/admin/:id',AuthController.deleteAdminAccount);
+
+/**
+ * @desc delete renter account by ID from the Admin or the user him self
+ * @route /auth/delete/renter/:id
+ * @method DELETE
+ * @access private
+ */
+router.delete('/delete/renter/:id',AuthController.deleteRenterAccount);
+
+/**
+ * @desc delete owner account by ID from the Admin or the user him self
+ * @route /auth/owner/renter/:id
+ * @method DELETE
+ * @access private
+ */
+router.delete('/delete/owner/:id',AuthController.deleteOwnerAccount);
+
+/**
+ * @desc delete delivery account by ID from the Admin or the user him self
+ * @route /auth/delivery/renter/:id
+ * @method DELETE
+ * @access private
+ */
+router.delete('/delete/delivery/:id',AuthController.deleteDeliveryAccount);
 
 export default router;

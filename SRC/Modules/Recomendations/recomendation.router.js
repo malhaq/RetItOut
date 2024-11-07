@@ -7,14 +7,14 @@ import * as RecomendationController from './controller/recomendation.controller.
 
 const router = Router();
 
-router.get('/recomendedProducts',adminCheckAuth,RecomendationController.productWithHighRental);
-router.get('/recomendedProducts',renterCheckAuth,RecomendationController.productWithHighRental);
-router.get('/recomendedProducts',ownerCheckAuth,RecomendationController.productWithHighRental);
-router.get('/recomendedProducts',deliveryCheckAuth,RecomendationController.productWithHighRental);
+router.get('/RecomendedProducts-A',adminCheckAuth,RecomendationController.productWithHighRental);
+router.get('/recomendedProducts-R',renterCheckAuth,RecomendationController.productWithHighRental);
+router.get('/recomendedProducts-O',ownerCheckAuth,RecomendationController.productWithHighRental);
+router.get('/recomendedProducts-D',deliveryCheckAuth,RecomendationController.productWithHighRental);
 
-router.post('/nHighProductRental:id',adminCheckAuth,RecomendationController.nProductWithHighRental);
-router.post('/nHighProductRental:id',renterCheckAuth,RecomendationController.nProductWithHighRental);
-router.post('/nHighProductRental:id',ownerCheckAuth,RecomendationController.nProductWithHighRental);
-router.post('/nHighProductRental:id',deliveryCheckAuth,RecomendationController.nProductWithHighRental);
+router.post('/nHighProductRental-A/:n',RecomendationController.nProductWithHighRental);
+router.post('/nHighProductRental-R/:n',renterCheckAuth,RecomendationController.nProductWithHighRental);
+router.post('/nHighProductRental-O/:n',ownerCheckAuth,RecomendationController.nProductWithHighRental);
+router.post('/nHighProductRental-D/:n',deliveryCheckAuth,RecomendationController.nProductWithHighRental);
 
 export default  router;

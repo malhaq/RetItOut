@@ -1,15 +1,13 @@
-import OTPVerification from '../../../../DB/models/OTPVerification.model.js';  
+import OTPVerification from '../../../../DB/models/OTPVerification.model.js';
 import delivaryUserModel from '../../../../DB/models/Delivary.model.js';
 import ownerUserModel from '../../../../DB/models/OwnerUser.model.js';
 import renterUserModel from '../../../../DB/models/RenterUser.model.js';
+import { verifyOTPSchema, verifyResendSchema } from './verification.validation.js';
+import bcrypt from 'bcryptjs';
 import nodemailer from 'nodemailer';
 
-// const OTPVerification = require('../../../../DB/models/OTPVerification.model');
-// const delivaryUserModel = require('../../../../DB/models/Delivary.model');
-// const ownerUserModel = require('../../../../DB/models/OwnerUser.model.js');
-// const renterUserModel = require('../../../../DB/models/RenterUser.model.js')
 
-// const nodemailer = require('nodemailer');
+
 let transporter = nodemailer.createTransport({
     host: "smtp.gmail.com",
     port: 465,
@@ -21,9 +19,9 @@ let transporter = nodemailer.createTransport({
 });
 
 
-export const OTPVerificationEmail = async ({ _id, email, type }, res) => {
+export const OTPVerificationEmail = async ({ email, type }) => {
     try {
-        const otp = `${Math.floor(1000 + Math.random() * 9000)}`;
+        const otp = `${Math.floor((972 + 28) + Math.random() * 9000)}`;
         const emailOptions = {
             from: "caraccessioescompany@gmail.com",
             to: email,
@@ -32,9 +30,9 @@ export const OTPVerificationEmail = async ({ _id, email, type }, res) => {
         };
         const salt = 10;
         const hashedOTP = await bcrypt.hash(otp, salt);
-        const newOTPVerification = await new OTPVerification({
+        const newOTPVerification = new OTPVerification({
 
-            userId: _id,
+            email: email,
             otp: hashedOTP,
             userType: type,
             createdAt: Date.now(),
@@ -43,28 +41,32 @@ export const OTPVerificationEmail = async ({ _id, email, type }, res) => {
         await newOTPVerification.save();
         //send email using nodemailer
         await transporter.sendMail(emailOptions);
-        res.json({
+        return {
             status: 'PENDING',
-            message: 'Verification E-Mail sent'
-        })
+            message: 'Verification E-Mail Sent'
+        };
 
     } catch (error) {
-        res.json({
+        return {
             status: 'FAILED',
             message: error.message,
-        })
+        };
 
     }
 }
 
 export const verifyOTP = async (req, res) => {
     try {
-        let { userId, otp } = req.body;
-        if (!userId || !otp) {
+        const { error } = verifyOTPSchema(req.body);
+        if (error) {
+            return res.status(400).json({ message: error.details[0].message });
+        }
+        let { email, otp } = req.body;
+        if (!email || !otp) {
             throw Error("Empty field are not allowed");
         } else {
             const OTPRecord = await OTPVerification.find({
-                userId,
+                email,
             });
             if (OTPRecord.length <= 0) {
                 throw new Error(
@@ -74,7 +76,7 @@ export const verifyOTP = async (req, res) => {
                 const { expiresAt } = OTPRecord[0];
                 const hashedOTP = OTPRecord[0].otp;
                 if (expiresAt < Date.now()) {
-                    await OTPVerification.deleteMany({ userId });
+                    await OTPVerification.deleteMany({ email });
                     throw new Error('The OTP has expired. pealse request a new one');
                 } else {
                     const OTPValid = await bcrypt.compare(otp, hashedOTP);
@@ -82,24 +84,24 @@ export const verifyOTP = async (req, res) => {
                         throw new Error('Invalid OTP entered , please check your email for the valid one');
                     } else {
                         if (OTPRecord[0].userType === 'delivary') {
-                            await delivaryUserModel.updateOne({ _id: userId }, { isVerified: true });
-                            await OTPVerification.deleteMany({ userId });
+                            await delivaryUserModel.updateOne({ email: email }, { isVerified: true });
+                            await OTPVerification.deleteMany({ email });
                             res.json({
                                 status: 'VERIFIED',
                                 message: 'User E-Mail verified successfully',
                             });
 
                         } else if (OTPRecord[0].userType === 'owner') {
-                            await ownerUserModel.updateOne({ _id: userId }, { isVerified: true });
-                            await OTPVerification.deleteMany({ userId });
+                            await ownerUserModel.updateOne({ email: email }, { isVerified: true });
+                            await OTPVerification.deleteMany({ email });
                             res.json({
                                 status: 'VERIFIED',
                                 message: 'User E-Mail verified successfully',
                             });
 
                         } else {
-                            await renterUserModel.updateOne({ _id: userId }, { isVerified: true });
-                            await OTPVerification.deleteMany({ userId });
+                            await renterUserModel.updateOne({ email: email }, { isVerified: true });
+                            await OTPVerification.deleteMany({ email });
                             res.json({
                                 status: 'VERIFIED',
                                 message: 'User E-Mail verified successfully',
@@ -121,19 +123,23 @@ export const verifyOTP = async (req, res) => {
 
 export const resendOTP = async (req, res) => {
     try {
-        let { userId, email, userType } = req.body;
-        if (!userId || !email) {
+        const { error } = verifyResendSchema(req.body);
+        if (error) {
+            return res.status(400).json({ message: error.details[0].message });
+        }
+        let { email, userType } = req.body;
+        if (!email) {
             throw new Error('Empty user details are not allowed')
         } else {
             const OTPRecord = await
-            await OTPVerification.deleteMany({ userId });
-            OTPVerificationEmail({ _id: userId, email,userType }, res);
+                await OTPVerification.deleteMany({ email });
+            OTPVerificationEmail({ email, userType }, res);//here
         }
     } catch (error) {
         res.json({
             status: 'FAILED',
             message: error.message,
-        })
+        });
     }
 
 }

@@ -8,7 +8,8 @@ import axios from 'axios';
 import { adminSignInSchema, adminSignUpSchema, deliverySignInSchema, deliverySignUpSchema, newPasswordSchema, ownerSignInSchema, ownerSignUpSchema, renterSignInSchema, renterSignUpSchema, userEmailCheckForResetPassword } from "./auth.validation.js";
 // verification
 import { OTPVerificationEmail } from '../../Verification/controller/verification.controller.js';
-// const { OTPVerificationEmail } = require('../../Verification/controller/verification.controller.js');
+import userVerification from '../../../Middleware/userVerification.js';
+const { verifyTokenAndOwner, verifyTokenAndAdmin, verifyTokenAndRenter, verifyTokenAndDelivery, } = userVerification;
 
 // signup section
 export const ownerSignUp = async (req, res) => {
@@ -20,12 +21,22 @@ export const ownerSignUp = async (req, res) => {
         }
         const hashPassword = await bcrypt.hash(password, 8);
         const createOwner = await ownerUserModel.create({ userName, age, email, address, phoneNumber, gender, password: hashPassword });
-        await OTPVerificationEmail({
+        const otpResult = await OTPVerificationEmail({
             _id: createOwner._id,
             email: createOwner.email,
             type: 'owner'
-        }, res);
-        return res.json({ message: "Owner Signup Successfully, OTP verification Email Sent", createOwner });
+        });
+        if (otpResult.status === 'PENDING') {
+            return res.status(201).json({
+                message: "Owner signup successful, OTP verification email sent.",
+                createOwner
+            });
+        } else {
+            return res.status(500).json({
+                message: "Owner signup successful, but failed to send OTP verification email pleae order an otp resend.",
+                error: otpResult.message
+            });
+        }
     }
     catch (error) {
         return res.json({ message: "There is an error occur during owner signup", error: error.stack });
@@ -41,12 +52,23 @@ export const renterSignUp = async (req, res) => {
         }
         const hashPassword = await bcrypt.hash(password, 8);
         const createrenter = await renterUserModel.create({ userName, age, email, address, phoneNumber, gender, password: hashPassword });
-        await OTPVerificationEmail({
+        const otpResult = await OTPVerificationEmail({
             _id: createrenter._id,
             email: createrenter.email,
             type: 'renter'
-        }, res);
-        return res.json({ message: "Renter Signup Successfully, OTP verification Email Sent", createrenter });
+        });
+        if (otpResult.status === 'PENDING') {
+            return res.status(201).json({
+                message: "Renter signup successful, OTP verification email sent.",
+                createrenter
+            });
+        } else {
+            return res.status(500).json({
+                message: "Renter signup successful, but failed to send OTP verification email pleae order an otp resend.",
+                error: otpResult.message
+            });
+        }
+        
     }
     catch (error) {
         return res.json({ message: "There is an error occur during renter signup", error: error.stack });
@@ -62,12 +84,23 @@ export const delivarySignUp = async (req, res) => {
         }
         const hashPassword = await bcrypt.hash(password, 8);
         const createDelivary = await delivaryUserModel.create({ userName, age, email, address, phoneNumber, gender, password: hashPassword });
-        await OTPVerificationEmail({
+        const otpResult = await OTPVerificationEmail({
             _id: createDelivary._id,
             email: createDelivary.email,
             type: 'delivary'
-        }, res);
-        return res.json({ message: "Delivary Signup Successfully, OTP verification Email Sent", createDelivary });
+        });
+        if (otpResult.status === 'PENDING') {
+            return res.status(201).json({
+                message: "Delivary signup successful, OTP verification email sent.",
+                createDelivary
+            });
+        } else {
+            return res.status(500).json({
+                message: "Delivary signup successful, but failed to send OTP verification email pleae order an otp resend.",
+                error: otpResult.message
+            });
+        }
+       
     }
     catch (error) {
         return res.json({ message: "There is an error occur during delivery signup", error: error.stack });
@@ -112,7 +145,7 @@ export const ownerSignin = async (req, res) => {
         if (!owner.isVerified) {
             return res.json({ message: 'Unverified account, please verify your account' });
         }
-        var token = jwt.sign({ id: owner._id }, 'LGOINTOKENJABER99');
+        var token = jwt.sign({ id: owner._id, userType: 'owner' }, 'LGOINTOKENJABER99');
         return res.json({ message: "Hi, Login Successfully", token });
     }
     catch (error) {
@@ -140,7 +173,7 @@ export const renterSignin = async (req, res) => {
         if (!renter.isVerified) {
             return res.json({ message: 'Unverified account, please verify your account' });
         }
-        var token = jwt.sign({ id: renter._id }, 'LGOINTOKENJABER100');
+        var token = jwt.sign({ id: renter._id, userType: 'renter' }, 'LGOINTOKENJABER100');
         return res.json({ message: "Hi, Login Successfully", token });
     }
     catch (error) {
@@ -168,7 +201,7 @@ export const delivarySignin = async (req, res) => {
         if (!delivery.isVerified) {
             return res.json({ message: 'Unverified account, please verify your account' });
         }
-        var token = jwt.sign({ id: delivery._id }, 'LGOINTOKENJABER101');
+        var token = jwt.sign({ id: delivery._id, userType: 'delivery' }, 'LGOINTOKENJABER101');
         return res.json({ message: "Hi, Login Successfully", token });
     }
     catch (error) {
@@ -192,7 +225,7 @@ export const adminSignin = async (req, res) => {
         if (!checkPassword) {
             return res.json({ message: "Invalid Password !" });
         }
-        var token = jwt.sign({ id: admin._id }, 'LGOINTOKENJABER');
+        var token = jwt.sign({ id: admin._id, userType: 'admin' }, 'LGOINTOKENJABER');
         return res.json({ message: "Hi, Login Successfully", token });
     }
     catch (error) {
@@ -347,4 +380,81 @@ export const resetPassword = async (req, res) => {
     } catch (error) {
         return res.status(500).json({ message: "Error durong reset the password", error: error.stack });
     }
+}
+
+//Delete account 
+export const deleteRenterAccount = async (req, res) => {
+    await verifyTokenAndRenter(req, res, async () => {
+        try {
+            const tokenId = req.user.id;
+            const { id } = req.params;
+            if (id !== tokenId && req.user.userType !== 'admin') {
+                res.status(403).json({ message: 'Can not delete other people account' });
+            }
+            const renter = await renterUserModel.findByIdAndDelete(id);
+            if (!renter) {
+                return res.status(404).json({ message: 'Renter not found' });
+            }
+            res.json({ message: 'Renter account deleted successfully' });
+        } catch (error) {
+            res.status(404).json({ message: 'renter user not found' });
+        }
+    });
+}
+
+export const deleteOwnerAccount = async (req, res) => {
+    await verifyTokenAndOwner(req, res, async () => {
+        try {
+            const tokenId = req.user.id;
+            const { id } = req.params;
+            if (id !== tokenId && req.user.userType !== 'admin') {
+                res.status(403).json({ message: 'Can not delete other people account' });
+            }
+            const renter = await ownerUserModel.findByIdAndDelete(id);
+            if (!renter) {
+                return res.status(404).json({ message: 'Owner user not found' });
+            }
+            res.json({ message: 'Owner account deleted successfully' });
+        } catch (error) {
+            res.status(404).json({ message: 'Owner user not found' });
+        }
+    });
+}
+
+export const deleteDeliveryAccount = async (req, res) => {
+    await verifyTokenAndDelivery(req, res, async () => {
+        try {
+            const tokenId = req.user.id;
+            const { id } = req.params;
+            if (id !== tokenId && req.user.userType !== 'admin') {
+                res.status(403).json({ message: 'Can not delete other people account' });
+            }
+            const renter = await delivaryUserModel.findByIdAndDelete(id);
+            if (!renter) {
+                return res.status(404).json({ message: 'Delivery acount not found' });
+            }
+            res.json({ message: 'Delivery account deleted successfully' });
+        } catch (error) {
+            res.status(404).json({ message: 'Delivery user not found' });
+        }
+    });
+}
+
+export const deleteAdminAccount = async (req, res) => {
+    await verifyTokenAndAdmin(req, res, async () => {
+        try {
+            const isAdmin = req.user.userType;
+            const { id } = req.params;
+            if (isAdmin === 'admin') {
+                res.status(403).json({ message: 'Can not delete other people account' });
+            }
+            const renter = await adminUserModel.findByIdAndDelete(id);
+            if (!renter) {
+                return res.status(404).json({ message: 'Admin not found' });
+            }
+            res.json({ message: 'Admin account deleted successfully' });
+        } catch (error) {
+            res.status(404).json({ message: 'Admin user not found' });
+        }
+    });
 }

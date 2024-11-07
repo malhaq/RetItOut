@@ -2,7 +2,7 @@ import mongoose from 'mongoose';  // Use import for ES module
 const Schema = mongoose.Schema;
 
 const OTPVerificationSchema = new Schema({
-    userId: String,
+    email: String,
     otp: String,
     userType: String,
     createdAt: Date,

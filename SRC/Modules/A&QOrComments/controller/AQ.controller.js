@@ -4,6 +4,7 @@ import RentersCommentsModel from "../../../../DB/models/RentersComments.model.js
 import { commentSchema } from "./AQ.validation.js";
 import ProductCommentsModel from './../../../../DB/models/ProductComments.model.js';
 
+// ask owners the question or send comment to the owner about a certain item :
 export const addComment = async (req,res,next)=>{
   try{
     const {ownerEmail,productId,comment,isQuestion} = req.body;
@@ -70,8 +71,20 @@ export const ownerViewQuestions = async(req,res) =>{
      return res.json({message:"Error during viewing the answers"});
     }
 };
+export const ownerViewComments = async(req,res) =>{
+  try{
+   const id = req.userId;
+   const commentsForMe = await RentersCommentsModel.find({ownerId:id,isQuestion: false});
+   if(!commentsForMe){
+    return res.status(404).json({message:"No Comment about your items"});
+   }
+   return res.status(200).json({message:"Your Comments :",commentsForMe});
+  }catch(error){
+   return res.json({message:"Error during viewing the answers"});
+  }
+};
 
-// general comment about some product
+// general-for all users comment about some item
 
 export const writeComment = async (req,res)=>{
   try{

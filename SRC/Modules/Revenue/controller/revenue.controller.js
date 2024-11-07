@@ -16,7 +16,7 @@ export const getRevenues = async (req, res) => {
       totalRevenue: totalRevenue[0]?.totalRevenue || 0,
     });
   } catch (error) {
-    return res.json({
+    return res.status(500).json({
       message: "Error during displaying the platform revenues",
       error: error.stack,
     });
@@ -28,7 +28,7 @@ export const getCatRevenues = async (req,res)=>{
         const { categoryName } = req.params;
         const checkCatName = RevenueSchema.validate({categoryName});
         if(checkCatName.error){
-            return res.json(checkCatName.error);
+            return res.status(400).json(checkCatName.error);
         }
         const categoryRevenue = await RevenueModel.aggregate([
           {
