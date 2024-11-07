@@ -2,7 +2,7 @@ import adminUserModel from "../../../../DB/models/AdminUser.model.js";
 import ownerUserModel from "../../../../DB/models/OwnerUser.model.js";
 import renterUserModel from "../../../../DB/models/RenterUser.model.js";
 import delivaryUserModel from "../../../../DB/models/Delivary.model.js";
-import { adminUpdateSchema } from "./adminprofile.validation.js";
+import { adminUpdateSchema, insuranceSchema } from "./adminprofile.validation.js";
 import { ownerUpdateSchema } from "../../OwnerProfile/controller/ownerprofile.validation.js";
 import { renterUpdateSchema } from "../../RenterProfile/controller/renterprofile.validation.js";
 import { deliveryUpdateSchema } from "../../DeliveryProfile/controller/deliveryprofile.validation.js";
@@ -12,6 +12,10 @@ import { json } from "express";
 import UserComplaintModel from "../../../../DB/models/UserComplaint.model.js";
 import axios from 'axios';
 import Item from "../../Item/controller/itemModel.js";
+import insurancesModel from "../../../../DB/models/Insurances.model.js";
+import UserInsuranceModel from "../../../../DB/models/UserInsurance.model.js";
+import InsuranceRevenueModel from "../../../../DB/models/InsuranceRevenie.model.js";
+
 
 export const updateAdminProfile = async (req,res)=>{
     try{
@@ -185,31 +189,43 @@ export const getAllUsersComplaint = async (req,res)=>{
    }
 };
 
-export const CompalintProcces = async (req,res)=>{
-   try{
-    // check the rental first
-
-    const {complaintId} = req.body;
-    const ProcessComplaint = await UserComplaintModel.findByIdAndUpdate(complaintId,{MsgStatus:"Approved"});
-    const renterComplaint = await UserComplaintModel.findOne({complaintId});
-    const renterId = renterComplaint.renterId;
-    const renter = await renterUserModel.find({renterId});
-    const renterEmail  = renter.email;
-    try {
-      await axios.post('http://localhost:3000/email/sendEmail', {
-          to: renterEmail,
-          subject: "Replay regrading to your complaint message",
-          text: `Dear User,\n\nThank you for your question and we solve the problem as soon as possible. \n\nBest regards,\nRental Platform`,
+// complaint messages process
+export const ComplaintProcess = async (req, res) => {
+  try {
+      const { id } = req.params;
+      const ProcessComplaint = await UserComplaintModel.findByIdAndUpdate(
+          id,
+          { MsgStatus: "Approved" }
+      );
+      if (!ProcessComplaint) {
+          return res.status(404).json({ message: "Not Found the complaint!" });
+      }
+      // renter notification
+      const complaint  = await UserComplaintModel.findOne({_id:id});
+      const renterId = complaint.renterId;
+      const renter = await renterUserModel.findOne({_id:renterId});
+      try {
+        await axios.post('http://localhost:3000/email/sendEmail',
+            {
+                to: renter.email,
+                subject: "Complaint Solved",
+                text: `Dear Renter,\n\nYout complaint request is solved\n\nWe apologize for the problem\n\nBest regards,\nRental Platform`,
+            });
+    } catch (error) {
+        return res.json({ message: "Error during sending the email", error: error.stack });
+    }
+      return res.status(200).json({
+          message: "Complaint message processed successfully.",
+          ProcessComplaint,
       });
-
-      return res.status(200).json({ message: "OTP sent successfully", OTPCode });
   } catch (error) {
-      return res.status(500).json({ message: "Error during sending the email", error: error.stack });
+      return res.status(500).json({
+          message: "Error during processing the complaint",
+          error: error.stack,
+      });
   }
-   }catch(error){
-    return res.status(500).json({message:"Error during procees the complaint",error:error.stack});
-   }
 };
+
 
 // filters section
 export const getAllOWners = async (req,res)=>{
@@ -279,10 +295,88 @@ export const getAllCatProducts = async (req,res)=>{
   }
 };
 
-export const getAllCatRentals = async (req,res)=>{
-  try{
 
+// insurance section
+
+export const addInsurance = async (req,res)=>{
+  try{
+   const {insuName,price,coveredProductsNumber,coverageDuration,active} = req.body;
+   const checkInputData = insuranceSchema.validate({insuName,price,coveredProductsNumber,coverageDuration,active},{abortEarly: false });
+   if(checkInputData.error){
+    return res.status(400).json(checkInputData.error);
+   }
+   const insurance = await insurancesModel.create({insuName,price,coveredProductsNumber,coverageDuration});
+   if(!insurance){
+    return res.status(500).json({messagr:"Error during create new insurance"});
+   }
+   return res.status(200).json({message:"The insurance created successfully",insurance});
   }catch(error){
-    return res.status(500).json({message:"Error during get all Cat. rental !",error:error.stack});
+    return res.status(500).json({message:"Error during add new insurance",error:error.stack});
+  }
+};
+
+export const updateInsurance = async (req,res)=>{
+  try{
+    const { isuranceId } = req.params;
+    const {insuName,price,coveredProductsNumber,coverageDuration,active} = req.body;
+    const checkInputData = insuranceSchema.validate({insuName,price,coveredProductsNumber,coverageDuration,active},{abortEarly: false });
+    if(checkInputData.error){
+     return res.status(400).json(checkInputData.error);
+    }
+    const updatedInsurance =await insurancesModel.findByIdAndUpdate( isuranceId,{insuName,price,coveredProductsNumber,coverageDuration,active});
+    if(!updatedInsurance){
+      return res.status(404).json({message:"Insurance Not Found!"});
+    }
+    return res.status(200).json({message:"The insurance data updated successfully : ",updatedInsurance});
+  }catch(error){
+    return res.status(500).json({message:"Error during update insurance",error:error.stack});
+  }
+};
+export const destroyInsurance = async (req,res)=>{
+  try{
+    const { isuranceId } = req.params;
+    const insurance = await insurancesModel.findByIdAndDelete(isuranceId);
+    if(!insurance){
+      return res.status(404).json({message:"Insurance Not Found!"});
+    }
+    return res.status(200).json({message:"Insurance deleted successfully"});
+  }catch(error){
+    return res.status(500).json({message:"Error during destroy insurance",error:error.stack});
+  }
+};
+
+export const showAllInsurances = async (req,res)=>{
+  try{
+   const allInsurancesData = await insurancesModel.find();
+   if(!allInsurancesData){
+    return res.status(404).json({message:"No Insurances Found!"});
+  }
+  return res.status(200).json({messsage:"This is all insurances data: ",allInsurancesData});
+  }catch(error){
+    return res.status(500).json({message:"Error during dispaly all  insurances",error:error.stack});
+  }
+};
+
+
+// revenues section
+export const getRevenues = async (req, res) => {
+  try {
+    const totalRevenue = await InsuranceRevenueModel.aggregate([
+      {
+        $group: {
+          _id: null,
+          platformRevenue: { $sum: "$amoutOfMoney" },
+        },
+      },
+    ]);
+    return res.json({
+      message: "Total revenue retrieved successfully",
+      platformRevenue: totalRevenue[0]?.platformRevenue || 0,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      message: "Error during displaying the platform revenues",
+      error: error.stack,
+    });
   }
 };

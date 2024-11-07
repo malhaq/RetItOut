@@ -31,7 +31,7 @@ function itemValidateSchema(obj) {
 }
 
 
-
+// Joi validation schema for Order creation
 function orderValidateSchema(obj){
 const orderSchema = Joi.object({
     itemId: Joi.string().required(),

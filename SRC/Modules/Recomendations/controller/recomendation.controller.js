@@ -1,4 +1,5 @@
 import testModel from "../../../../DB/models/test.model.js";
+import Item from "../../Item/controller/itemModel.js";
 
 
 export const productWithHighRental = async (req, res) => {
@@ -11,11 +12,15 @@ export const productWithHighRental = async (req, res) => {
                 }
             },{$sort: { rentalCount: -1 }}, { $limit: 1}
         ]);
-
+        const itemId = productWithHighRent[0]._id;
+        const itemRentalCount = productWithHighRent[0].rentalCount;
+        const item = await Item.findOne({_id:itemId});
+        const itemName = item.name;
         if (productWithHighRent.length > 0) {
             return res.status(200).json({
-                productId: productWithHighRent[0]._id,
-                rentalCount: productWithHighRent[0].rentalCount
+                productId: itemId ,
+                productName : itemName ,
+                rentalCount: itemRentalCount
             });
         } else {
             return res.status(404).json({ message: "No Products found!" });
@@ -43,9 +48,14 @@ export const nProductWithHighRental = async (req,res)=>{
         ]);
 
         if (nHighProduct.length > 0) {
+            const itemId = nHighProduct[0]._id;
+            const itemCount = nHighProduct[0].productCount;
+            const item = await Item.findOne({_id:itemId});
+            const itemName = item.name;
             return res.status(200).json({
-                productId: nHighProduct[0]._id,
-                productCount: nHighProduct[0].productCount
+                productId: itemId,
+                productName:itemName,
+                rentalCount: itemCount
             });
         } else {
             return res.status(404).json({ message: "No products found!" });

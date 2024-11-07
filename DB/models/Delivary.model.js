@@ -31,7 +31,7 @@ const delivaryUserSchema = new Schema({
     default: false
   },
   ratings: [{
-    orderid: { type: mongoose.Schema.Types.ObjectId, ref: 'oredrstable' },//this should reference the order that is beaing delivered
+    orderid: { type: mongoose.Schema.Types.ObjectId, ref: 'orderSchema' },
     rating: Number,
     Comment: String,
   }]
