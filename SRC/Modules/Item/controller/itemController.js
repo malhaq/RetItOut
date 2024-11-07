@@ -1,7 +1,6 @@
 import Item from './itemModel.js';
 import Orders from '../../../../DB/models/Orders.model.js';
 
-// middle ware for verifying the token and the user type
 import userVerification from '../../../Middleware/userVerification.js';
 const {verifyTokenAndOwner, verifyTokenAndRenter } = userVerification;
 
