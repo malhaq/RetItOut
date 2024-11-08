@@ -28,6 +28,7 @@ const itemSchema = new Schema({
                     lng: Number
                 }
             }
+            
         },
     },
     rentalPrice: {
