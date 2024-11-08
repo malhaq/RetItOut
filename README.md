@@ -31,8 +31,7 @@
 To get this project up and running locally, you’ll need the following installed:
 
 - **Node.js** (v14 or higher)
-- **MySQL** (for database management)
-- **Docker** (optional, for containerized deployment)
+- **MongoDB** (for database management)
 
 ### Installation
 
