@@ -114,24 +114,56 @@ export const returnItem = async (req, res) => {
 };
 
 export const updatePricing = async (req, res) => {
-  await verifyTokenAndOwner(req, res, async () => {
-    try {
-      const { id } = req.params;
-      const { rentalPrice } = req.body;
+  const { id } = req.params;
+  const { daily, weekly, monthly } = req.body;
 
-      const updatedItem = await Item.findByIdAndUpdate(
-        id,
-        { rentalPrice },
-        { new: true, runValidators: true }
-      );
-
-      if (!updatedItem) {
-        return res.status(404).json({ message: 'Item not found' });
-      }
-
-      res.json(updatedItem);
-    } catch (error) {
-      res.status(400).json({ message: error.message });
+  try {
+    const item = await Item.findById(id);
+    if (!item) {
+      return res.status(404).json({ message: "Item not found" });
     }
-  });
+
+    // Update the pricing
+    item.rentalPrice.daily = daily;
+    item.rentalPrice.weekly = weekly;
+    item.rentalPrice.monthly = monthly;
+
+    await item.save();
+
+    return res.status(200).json({ message: "Pricing updated successfully", item });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: "Internal Server Error" });
+  }
 };
+
+
+
+
+
+export const updateRentalDuration = async (req, res) => {
+  const { id } = req.params; 
+  const { startDate, endDate } = req.body; 
+
+  if (!startDate || !endDate) {
+    return res.status(400).json({ message: "Start date and End date are required" });
+  }
+
+  try {
+    const item = await Item.findById(id);
+    if (!item) {
+      return res.status(404).json({ message: "Item not found" });
+    }
+
+    item.rentalDuration = { startDate, endDate };
+    await item.save();
+    return res.status(200).json({
+      message: "Rental duration updated successfully",
+      item,
+    });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: "Internal Server Error" });
+  }
+};
+

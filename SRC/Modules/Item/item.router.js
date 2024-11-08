@@ -7,8 +7,9 @@ import {
     deleteItem,
     rentItem,
     returnItem,
-    updatePricing 
+    updatePricing
 } from './controller/itemController.js';
+import { updateRentalDuration } from './controller/itemController.js';
 
 const router = express.Router();
 
@@ -20,6 +21,7 @@ router.put('/:id', updateItem);
 router.delete('/:id', deleteItem);           
 router.post('/:id/rent', rentItem);          
 router.post('/:id/return', returnItem);       
+router.put('/:id/rentalDuration', updateRentalDuration);
 
 router.put('/:id/pricing', updatePricing);    
 
