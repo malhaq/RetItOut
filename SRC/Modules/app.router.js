@@ -12,6 +12,7 @@ import RecomendationRouter from './Recomendations/recomendation.router.js';
 import ItemRouter from './Item/item.router.js';
 import Verification from './Verification/verification.router.js';
 import Rating from './trust&safety/TS.router.js';
+import logistic from './logistics/logistics.router.js'
 
 
 const initApp=(app,express)=>{
@@ -30,6 +31,7 @@ const initApp=(app,express)=>{
     app.use('/items', ItemRouter);
     app.use('/verification',Verification);
     app.use('/rate',Rating);
+    app.use('/logistic',logistic)
     app.use('/*',(req,res)=>{
         return res.json({message:"page not found"});
     })
