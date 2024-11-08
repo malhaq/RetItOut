@@ -1,59 +1,43 @@
-RentItOut: Peer-to-Peer Rental Platform for Everyday Items
-RentItOut is a platform that allows users to rent everyday items they own but don’t use frequently, such as tools, electronics, and sports gear. This project focuses on building a backend RESTful API to power the platform.
+# RentItOut: Peer-to-Peer Rental Platform for Everyday Items
 
-Features
-Item Listings: Users can list and manage items for rent (tools, electronics, etc.).
-Rental Management: Set rental durations, pricing, and flexible rental periods.
-Trust & Safety: User verification, ratings, and security deposits.
-Logistics: Location-based pickup and delivery options.
-Revenue Model: Commission-based fees and optional damage protection.
-Tech Stack
-Backend: Node.js, Express.js
-Database: MySQL
-Authentication: JWT (JSON Web Tokens)
-API Docs: Swagger
-Other: Docker (for containerization), Google Maps API, Nodemailer (email service)
-Getting Started
-Prerequisites:
-Node.js (v14+)
-MySQL
-Docker (optional)
-Installation:
-Clone the repository:
-bash
-Copy code
-git clone https://github.com/malhaq/RetItOut
-cd rentitout
-Install dependencies:
-bash
-Copy code
-npm install
-Set up MySQL and create the database (rentitout).
-Start the app:
-bash
-Copy code
-npm start
-API will be running on http://localhost:3000.
+**RentItOut** is a platform that allows users to rent everyday items they own but don’t use frequently, such as tools, electronics, and sports gear. This project focuses on building a **backend RESTful API** that powers the platform, making it easy for users to list, rent, and manage items.
 
-API Documentation
-API endpoints include:
+---
 
-POST /api/items - Create a new listing
-GET /api/items - Get all listings
-PUT /api/items/{id} - Update a listing
-DELETE /api/items/{id} - Delete a listing
-Authentication:
-Use JWT for secure login and role-based access control.
+## Features
 
-Testing
-Run tests with:
+- **Item Listings**: Users can list items they wish to rent out, including tools, electronics, sports equipment, etc.
+- **Rental Management**: Manage rental durations, pricing, and flexible rental periods for each item.
+- **Trust & Safety**: Implement user verification, item ratings, and security deposits to ensure a safe rental process.
+- **Logistics**: Location-based options for pickup and delivery of items using integrated mapping services.
+- **Revenue Model**: Platform generates revenue via commission-based fees, with optional damage protection.
 
-bash
-Copy code
-npm run test
-Contributing
-Fork the repo.
-Create a branch (git checkout -b feature-name).
-Submit a pull request.
-License
-MIT License. See the LICENSE file for details.
+---
+
+## Tech Stack
+
+- **Backend**: Node.js, Express.js
+- **Database**: MongoDB
+- **Authentication**: JWT (JSON Web Tokens) for secure login and authorization
+- **API Documentation**: Postman and wiki for API documentation
+- **External APIs**: Google Maps API (location-based services), Nodemailer (for email notifications)
+
+---
+
+## Getting Started
+
+### Prerequisites
+
+To get this project up and running locally, you’ll need the following installed:
+
+- **Node.js** (v14 or higher)
+- **MySQL** (for database management)
+- **Docker** (optional, for containerized deployment)
+
+### Installation
+
+ **Clone the repository**:
+
+   ```bash
+   git clone https://github.com/malhaq/RentItOut.git
+   cd RentItOut
