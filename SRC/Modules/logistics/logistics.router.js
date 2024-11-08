@@ -35,7 +35,7 @@ router.put('/delivery/:id/delivered/',logistic.markAsDelivered);
 router.get('/delivery/tobe-delivered/',logistic.getMyUndelivered);
 
 /**
- * @desc get all driver's orders the delivered and not yet delivered
+ * @desc get all delivery's orders the delivered and not yet delivered
  * @route /logistic/delivery/my-orders/
  * @method GET
  * @access private
