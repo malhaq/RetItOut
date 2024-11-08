@@ -29,7 +29,6 @@ const itemSchema = new Schema({
                 }
             }
         },
-        
     },
     rentalPrice: {
         daily: {
